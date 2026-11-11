@@ -1,17 +1,76 @@
 /* ==========================================================
    common.js — shared helpers for all pages
    ========================================================== */
+/* ------------------------------------------------------------
+   Login token. Cookies alone are dropped inside cross-site/sandboxed
+   iframes (e.g. preview panes), so the API also accepts the session as
+   an "Authorization: Bearer <token>" header. Storage is best-effort:
+   sandboxed frames can throw on storage access, hence the try/catch.
+   ------------------------------------------------------------ */
+const TOKEN_KEY = 'vs_pharma_token';
+let _memoryToken = null;
+
+const authToken = {
+  _persisted: false,
+  get() {
+    if (_memoryToken) return _memoryToken;
+    try { _memoryToken = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || null; } catch (e) { /* sandboxed */ }
+    return _memoryToken;
+  },
+  set(token) {
+    _memoryToken = token || null;
+    authToken._persisted = false;
+    try {
+      if (token) { localStorage.setItem(TOKEN_KEY, token); authToken._persisted = true; }
+      else { localStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(TOKEN_KEY); }
+    } catch (e) {
+      try {
+        if (token) { sessionStorage.setItem(TOKEN_KEY, token); authToken._persisted = true; }
+        else sessionStorage.removeItem(TOKEN_KEY);
+      } catch (e2) { /* memory only — happens inside sandboxed iframes */ }
+    }
+  },
+  isPersisted() { return authToken._persisted; },
+  clear() { authToken.set(null); },
+};
+
+/** Builds a link that carries the session when storage is unavailable. */
+function handoffUrl(target) {
+  const token = authToken.get();
+  if (token && !authToken.isPersisted()) {
+    return target + (target.indexOf('#') === -1 ? '#t=' + encodeURIComponent(token) : '');
+  }
+  return target;
+}
+
+/* A page may receive the session through the URL fragment (sandboxed frames). */
+(function adoptHashToken() {
+  try {
+    const m = /[#&]t=([^&]+)/.exec(location.hash || '');
+    if (!m) return;
+    authToken.set(decodeURIComponent(m[1]));
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ }
+  } catch (e) { /* ignore */ }
+})();
+
 const API = {
   async call(path, method = 'GET', body) {
+    const token = authToken.get();
+    const headers = {};
+    if (body) headers['Content-Type'] = 'application/json';
+    if (token) headers.Authorization = 'Bearer ' + token;
     const res = await fetch(path, {
       method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      credentials: 'same-origin',
+      headers,
+      credentials: 'include',
       body: body ? JSON.stringify(body) : undefined,
     });
     let data = {};
     try { data = await res.json(); } catch { /* empty body */ }
-    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+    if (!res.ok) {
+      if (res.status === 401 && token) { authToken.clear(); clearMe(); }
+      throw new Error(data.error || `Request failed (${res.status})`);
+    }
     return data;
   },
   get: (p) => API.call(p),
@@ -67,6 +126,7 @@ function clearMe() { _me = undefined; }
 
 async function logout(redirect = '/index.html') {
   try { await API.post('/api/auth/logout'); } catch { /* ignore */ }
+  authToken.clear();
   clearMe();
   location.href = redirect;
 }
@@ -113,7 +173,7 @@ async function paintHeader() {
   const slot = document.getElementById('navAuth');
   if (slot) {
     slot.innerHTML = user
-      ? `<a class="navlink" href="${user.role === 'admin' ? '/admin.html' : '/account.html'}">${user.role === 'admin' ? 'Admin Panel' : 'My Account'}</a>
+      ? `<a class="navlink" data-href="${user.role === 'admin' ? '/admin.html' : '/account.html'}" href="${user.role === 'admin' ? '/admin.html' : '/account.html'}" onclick="this.href=handoffUrl(this.dataset.href)">${user.role === 'admin' ? 'Admin Panel' : 'My Account'}</a>
          <button class="btn ghost sm" onclick="logout('/index.html')">Logout</button>`
       : `<a class="navlink" href="/login.html">Login</a>
          <a class="btn sm" href="/login.html?tab=register">Register</a>`;

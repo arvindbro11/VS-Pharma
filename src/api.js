@@ -123,8 +123,8 @@ route('POST', '/api/auth/register', (ctx) => {
     role: 'customer',
     address,
   });
-  createSession(ctx.res, user);
-  return { status: 201, body: { user: require('./auth').publicUser(user) } };
+  const token = createSession(ctx.req, ctx.res, user);
+  return { status: 201, body: { user: require('./auth').publicUser(user), token } };
 });
 
 route('POST', '/api/auth/login', (ctx) => {
@@ -134,8 +134,8 @@ route('POST', '/api/auth/login', (ctx) => {
   if (!user || !verifyPassword(password, user.passwordHash)) {
     throw new HttpError(401, 'Invalid email or password');
   }
-  createSession(ctx.res, user);
-  return { status: 200, body: { user: require('./auth').publicUser(user) } };
+  const token = createSession(ctx.req, ctx.res, user);
+  return { status: 200, body: { user: require('./auth').publicUser(user), token } };
 });
 
 route('POST', '/api/auth/logout', (ctx) => {
