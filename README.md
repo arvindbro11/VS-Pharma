@@ -60,11 +60,14 @@ Want a completely empty store? Run `npm run reset` and start the server again �
 
 ```
 vs-pharmacy/
-├── server.js               # HTTP server, static files + REST API router, session cookie handling
+├── server.js               # LOCAL entry point: http.createServer(app).listen(3000)
+├── api/[...path].js        # VERCEL entry point: exports the same handler for /api/*
+├── vercel.json             # static output = public/, no-cache headers for html/css/js
 ├── package.json            # scripts (start / dev / reset) — no dependencies
 ├── .vscode/launch.json     # press F5 to run the website
 ├── src/
-│   ├── db.js               # JSON storage layer (one file per collection, atomic writes)
+│   ├── app.js              # shared request handler (API router + static files) used by both entries
+│   ├── db.js               # JSON storage layer (one file per collection, atomic writes, /tmp fallback)
 │   ├── auth.js             # scrypt password hashing + cookie sessions
 │   ├── api.js              # every API endpoint (auth, products, orders, sales, purchases, ledger, users, stats)
 │   └── seed.js             # first-run seed: admin + customer + 24 medicines
@@ -157,6 +160,46 @@ GET    /api/admin/stats
 Admin routes return **401** when not logged in and **403** for customer accounts.
 
 ---
+
+## 4b. Deploy on Vercel (serverless)
+
+The project ships two entry points so the exact same code runs locally **and** on Vercel:
+
+| Runtime | Entry point | What it does |
+|---|---|---|
+| Local / VPS | `server.js` | `http.createServer(app).listen(3000)` |
+| **Vercel** | `api/[...path].js` | exports the shared handler for every `/api/*` request |
+| Shared logic | `src/app.js` | API routing, cookies, JSON + static file serving |
+
+Static pages are served from `public/` (Vercel CDN). `vercel.json` sets `outputDirectory: "public"` and disables HTML/CSS/JS caching.
+
+### ⚠️ Why the first deploy showed `500: FUNCTION_INVOCATION_FAILED`
+
+Vercel never runs `server.js` — it only invokes **functions exported from `api/`**. The original repo had no `api/` folder and no exported handler, so every request failed at invocation. Fixed by adding `api/[...path].js` that exports the handler, and moving the shared logic into `src/app.js`.
+
+### Deploy steps
+
+```bash
+git add -A && git commit -m "add vercel serverless entry"
+git push                      # Vercel auto-redeploys if the repo is connected
+```
+or, from the CLI: `npm i -g vercel && vercel --prod`
+
+### Storage on Vercel (important)
+
+Serverless disks are **read-only and ephemeral**, so `data/*.json` cannot persist there. `src/db.js` detects this automatically and swaps to `/tmp/vs-pharma-data`:
+
+```
+[db] "/var/task/data" is not writable (EROFS) — using /tmp/vs-pharma-data
+```
+
+That means on Vercel the store works fully (login, sales, purchases, ledger) but **records can disappear on a cold start**, and two concurrent instances don't share data. For a permanent deployment set a real database, or point storage at a writable volume:
+
+```bash
+VS_DATA_DIR=/absolute/writable/path   # env var honoured by src/db.js
+```
+
+Swapping to MySQL/PostgreSQL/MongoDB only means re-implementing the six functions in `src/db.js` (`read`, `write`, `insert`, `update`, `remove`, `ensureData`) — no other file changes.
 
 ## 5. Design system — premium palette ("Onyx & Gold")
 
