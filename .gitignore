@@ -1,0 +1,9 @@
+# runtime data (created automatically) — keep the folder, ignore the contents if you use git
+data/*.json
+data/*.tmp
+
+node_modules/
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.env

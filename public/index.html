@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VS Pharma &amp; Medical Store — Medicines Online | Amritsar</title>
+<meta name="description" content="VS Pharma & Medical Store — genuine medicines, healthcare devices and daily pharmacy essentials. Order online, pay in rupees, home delivery in Amritsar." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23070707'/><path d='M42 22h16v20h20v16H58v20H42V58H22V42h20z' fill='%23d4af37'/></svg>" />
+<link rel="stylesheet" href="/css/style.css?v=2026-11-11-onyx4" />
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<div class="topbar">
+  <div class="wrap">
+    <span>🚚 Free home delivery on orders above ₹499 &nbsp;•&nbsp; 📞 +91 98765 43210</span>
+    <span>Licence No. PB-AMR-2026-1188 &nbsp;•&nbsp; Serving since 2026</span>
+  </div>
+</div>
+
+<!-- ================= HEADER ================= -->
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="/">
+      <span class="mark">VS</span>
+      <span>VS Pharma &amp; Medical Store
+        <small>Medicines • Devices • Wellness</small>
+      </span>
+    </a>
+    <nav class="main">
+      <a class="navlink" href="#shop">Shop</a>
+      <a class="navlink" href="#services">Services</a>
+      <a class="navlink" href="#about">About</a>
+      <a class="navlink" href="#contact">Contact</a>
+      <span id="navAuth" class="row" style="gap:.5rem"></span>
+      <button class="btn cart-btn" id="cartBtn" title="Cart">🛒 Cart <span class="count" id="cartCount" style="display:none">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="seal">Est.<b>2026</b>Amritsar</div>
+  <div class="wrap">
+    <div>
+      <span class="pill">✅ 100% genuine medicines • GST billed • Since 2026</span>
+      <h1>Your trusted neighbourhood <em>pharmacy</em>, now online.</h1>
+      <p>Order medicines, health devices and daily essentials from VS Pharma &amp; Medical Store. All prices in Indian Rupees (₹), delivered to your door with a proper bill.</p>
+      <div class="hero-actions">
+        <a class="btn warn" href="#shop">Browse Medicines ›</a>
+        <a class="btn ghost" href="/login.html">Customer Login</a>
+      </div>
+    </div>
+    <aside class="hero-card">
+      <ul>
+        <li><span class="ic">💊</span><div><b>Prescription medicines</b><br />Upload-free ordering with licensed pharmacist verification.</div></li>
+        <li><span class="ic">🧾</span><div><b>Credit (udhaar) khata</b><br />Regular customers can buy on credit — every entry recorded in the ledger.</div></li>
+        <li><span class="ic">🛡️</span><div><b>Admin-verified stock</b><br />Live inventory managed from the store admin panel.</div></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= TRUST ================= -->
+<div class="wrap">
+  <div class="trust">
+    <div class="card"><span class="ic">🚚</span><div><b>Same-day delivery</b><span>Within Amritsar city</span></div></div>
+    <div class="card"><span class="ic">💵</span><div><b>Cash / UPI / Credit</b><span>Pay in ₹ at your ease</span></div></div>
+    <div class="card"><span class="ic">👨‍⚕️</span><div><b>Licensed pharmacist</b><span>Guidance on every order</span></div></div>
+    <div class="card"><span class="ic">↩️</span><div><b>Easy returns</b><span>Within 7 days, bill required</span></div></div>
+  </div>
+</div>
+
+<!-- ================= SHOP ================= -->
+<section class="section" id="shop">
+  <div class="wrap">
+    <div class="spread" style="margin-bottom:1rem">
+      <div>
+        <span class="overline">The Collection</span>
+        <h2 style="margin-bottom:.15rem">Shop medicines &amp; essentials</h2>
+        <p class="muted" style="margin:0">Live stock from our store — prices include GST.</p>
+      </div>
+      <span class="badge info" id="stockInfo">loading stock…</span>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <span>🔍</span>
+        <input id="q" type="search" placeholder="Search by medicine, brand or category…" autocomplete="off" />
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="grid g3" id="productGrid">
+      <div class="empty">Loading medicines…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="section" id="services" style="background:var(--paper);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <span class="overline">What we do</span>
+    <h2>Six ways we look after your family</h2>
+    <p class="muted">Everything a family needs from a complete medical store — under one roof.</p>
+    <div class="grid g3" style="margin-top:1.2rem">
+      <div class="card"><h3>💊 Pharmacy counter</h3><p class="muted">Ayurvedic, allopathic and general medicines from trusted brands, always stored in temperature-controlled racks.</p></div>
+      <div class="card"><h3>🩺 Health devices</h3><p class="muted">BP monitors, glucometers, thermometers, nebulisers and pulse oximeters with warranty and demo.</p></div>
+      <div class="card"><h3>🧴 Personal care</h3><p class="muted">Sanitisers, masks, antiseptics, baby care and skin care products at MRP or below.</p></div>
+      <div class="card"><h3>📋 Monthly refills</h3><p class="muted">Standing orders for regular patients — we remind you before your stock runs out.</p></div>
+      <div class="card"><h3>🧾 Credit khata</h3><p class="muted">Approved customers can take medicines on credit; balances are maintained in the credit–debit ledger.</p></div>
+      <div class="card"><h3>🚚 Home delivery</h3><p class="muted">Free delivery above ₹499 within Amritsar. Orders before 6 PM are delivered the same day.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="section" id="about">
+  <div class="wrap grid g2" style="align-items:center">
+    <div>
+      <span class="overline">Our Story</span>
+      <h2>About VS Pharma &amp; Medical Store</h2>
+      <p>VS Pharma &amp; Medical Store started serving families in <b>2026</b> with one simple promise — genuine medicines at fair prices, with a bill for every purchase. What began as a single counter in Hall Bazaar, Amritsar now serves thousands of households through our online store and home-delivery network.</p>
+      <p>Our shop runs on a fully digital record system: every sale, every purchase from suppliers and every rupee of credit or debit is maintained in separate registers, so customers can always see exactly what they owe.</p>
+      <div class="row" style="gap:1.6rem;margin-top:1rem">
+        <div><div class="bigno">2026</div><small class="muted">Year established</small></div>
+        <div><div class="bigno">2,400+</div><small class="muted">Families served</small></div>
+        <div><div class="bigno">450+</div><small class="muted">Medicines in stock</small></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Store details</h3>
+      <table style="font-size:.86rem">
+        <tbody>
+          <tr><td class="muted">Shop name</td><td><b>VS Pharma &amp; Medical Store</b></td></tr>
+          <tr><td class="muted">Established</td><td><b>2026</b></td></tr>
+          <tr><td class="muted">Address</td><td>Shop 14, Hall Bazaar, Amritsar, Punjab 143001</td></tr>
+          <tr><td class="muted">Timing</td><td>Mon – Sat, 9:00 AM – 9:00 PM</td></tr>
+          <tr><td class="muted">Phone</td><td>+91 98765 43210</td></tr>
+          <tr><td class="muted">Drug licence</td><td>PB-AMR-2026-1188</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="section" id="contact" style="background:var(--paper);border-top:1px solid var(--line)">
+  <div class="wrap grid g2">
+    <div>
+      <span class="overline">Visit the Store</span>
+      <h2>Need a medicine urgently?</h2>
+      <p class="muted">Call the store or send us a message — our pharmacist will confirm availability and price in rupees before dispatch.</p>
+      <p>📞 <b>+91 98765 43210</b><br />✉️ <b>care@vspharmacy.in</b><br />📍 Shop 14, Hall Bazaar, Amritsar, Punjab 143001</p>
+    </div>
+    <div class="card">
+      <h3>Store hours</h3>
+      <table>
+        <tbody>
+          <tr><td>Monday – Friday</td><td class="right">9:00 AM – 9:00 PM</td></tr>
+          <tr><td>Saturday</td><td class="right">9:00 AM – 8:00 PM</td></tr>
+          <tr><td>Sunday</td><td class="right">10:00 AM – 2:00 PM</td></tr>
+          <tr><td>Emergency delivery</td><td class="right"><span class="badge ok">Available</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site" id="footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="logo" style="color:#fff">
+          <span class="mark">VS</span>
+          <span style="color:#fff">VS Pharma &amp; Medical Store<small style="color:#8f897c">Medicines • Devices • Wellness</small></span>
+        </div>
+        <p style="margin-top:.8rem">Your trusted medical store since 2026. Genuine medicines, honest prices and a bill for every rupee.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#shop">All medicines</a></li>
+          <li><a href="#services">Health devices</a></li>
+          <li><a href="#services">Personal care</a></li>
+          <li><a href="#shop">Monthly refills</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Account</h4>
+        <ul>
+          <li><a href="/login.html">Customer login</a></li>
+          <li><a href="/login.html?tab=register">Create account</a></li>
+          <li><a href="/account.html">My orders &amp; khata</a></li>
+          <li><a href="/admin.html">Admin panel</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>📞 +91 98765 43210</li>
+          <li>✉️ care@vspharmacy.in</li>
+          <li>📍 Hall Bazaar, Amritsar, Punjab 143001</li>
+          <li>🕘 Mon – Sat, 9 AM – 9 PM</li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2026 VS Pharma &amp; Medical Store. All rights reserved.</span>
+      <span>Drug Licence PB-AMR-2026-1188 • Prices in ₹ (INR) • GST included • <b style="color:var(--accent-soft)">Onyx &amp; Gold v4</b></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= CART DRAWER ================= -->
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer">
+  <header>
+    <b>Your cart</b>
+    <button class="iconbtn" id="closeDrawer" title="Close">✕</button>
+  </header>
+  <div class="items" id="cartItems"></div>
+  <footer>
+    <div class="totals" id="cartTotals"></div>
+    <button class="btn block" id="checkoutBtn">Proceed to checkout</button>
+    <p class="muted center" style="margin:.5rem 0 0;font-size:.74rem">Free delivery above ₹499 • Cash, UPI or Khata credit</p>
+  </footer>
+</aside>
+
+<!-- ================= CHECKOUT MODAL ================= -->
+<div class="modal-bg" id="modalBg"></div>
+<div class="modal" id="checkoutModal">
+  <header>
+    <h3>Checkout</h3>
+    <button class="iconbtn" id="closeModal">✕</button>
+  </header>
+  <div id="checkoutBody"></div>
+</div>
+
+<script src="/js/common.js?v=2026-11-11-onyx4"></script>
+<script>
+/* ---------------- state ---------------- */
+let PRODUCTS = [];
+let CATEGORY = 'all';
+let SEARCH = '';
+
+const grid = document.getElementById('productGrid');
+const chips = document.getElementById('chips');
+
+/* ---------------- products ---------------- */
+async function loadProducts() {
+  try {
+    const { products } = await API.get('/api/products');
+    PRODUCTS = products;
+    document.getElementById('stockInfo').textContent = products.length + ' items in stock';
+    const cats = ['all', ...new Set(products.map(p => p.category))];
+    chips.innerHTML = cats.map(c =>
+      `<button class="chip ${c === CATEGORY ? 'active' : ''}" data-cat="${esc(c)}">${c === 'all' ? 'All' : esc(c)}</button>`
+    ).join('');
+    chips.querySelectorAll('.chip').forEach(b => b.onclick = () => { CATEGORY = b.dataset.cat; loadProducts(); });
+    render();
+  } catch (e) {
+    grid.innerHTML = `<div class="empty">Could not load medicines: ${esc(e.message)}</div>`;
+  }
+}
+
+function render() {
+  const q = SEARCH.toLowerCase();
+  const list = PRODUCTS.filter(p =>
+    (CATEGORY === 'all' || p.category === CATEGORY) &&
+    (!q || `${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q))
+  );
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="big">🔍</span>No medicine found for “${esc(SEARCH || CATEGORY)}”.</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => {
+    const save = p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0;
+    return `<article class="product">
+      ${p.prescription ? '<span class="rx">Rx</span>' : ''}
+      <div class="thumb">${esc((p.brand || p.name).slice(0, 2).toUpperCase())}</div>
+      <span class="cat">${esc(p.category)}</span>
+      <span class="name">${esc(p.name)}</span>
+      <span class="brand">${esc(p.brand || '')} • ${esc(p.packSize || '')}</span>
+      <div class="price-row">
+        <span class="price">${money(p.price)}</span>
+        ${p.mrp > p.price ? `<span class="mrp">${money(p.mrp)}</span>` : ''}
+        ${save ? `<span class="save">${save}% off</span>` : ''}
+      </div>
+      <span class="stock">${p.stock > 0 ? `In stock: ${p.stock}` : '<b style="color:var(--danger)">Out of stock</b>'}</span>
+      <button class="btn sm block" data-add="${p.id}" ${p.stock > 0 ? '' : 'disabled'}>${p.stock > 0 ? 'Add to cart' : 'Unavailable'}</button>
+    </article>`;
+  }).join('');
+  grid.querySelectorAll('[data-add]').forEach(btn => {
+    btn.onclick = () => {
+      const p = PRODUCTS.find(x => x.id === Number(btn.dataset.add));
+      cart.add(p);
+      renderCart();
+    };
+  });
+}
+
+document.getElementById('q').addEventListener('input', (e) => { SEARCH = e.target.value; render(); });
+
+/* ---------------- cart ui ---------------- */
+const drawer = document.getElementById('drawer');
+const drawerBg = document.getElementById('drawerBg');
+const openDrawer = () => { drawer.classList.add('open'); drawerBg.classList.add('open'); renderCart(); };
+const closeDrawer = () => { drawer.classList.remove('open'); drawerBg.classList.remove('open'); };
+document.getElementById('cartBtn').onclick = openDrawer;
+document.getElementById('closeDrawer').onclick = closeDrawer;
+drawerBg.onclick = closeDrawer;
+
+function renderCart() {
+  const items = cart.read();
+  const box = document.getElementById('cartItems');
+  document.getElementById('cartCount').style.display = cart.count() ? 'grid' : 'none';
+  document.getElementById('cartCount').textContent = cart.count();
+
+  if (!items.length) {
+    box.innerHTML = `<div class="empty"><span class="big">🛒</span>Your cart is empty.<br /><small>Add medicines from the shop.</small></div>`;
+  } else {
+    box.innerHTML = items.map(i => `
+      <div class="ci">
+        <span class="nm">${esc(i.name)}<br /><small class="muted">${money(i.price)} × ${i.qty}</small></span>
+        <span class="right" style="font-weight:700">${money(i.price * i.qty)}</span>
+        <div class="qty">
+          <button onclick="changeQty(${i.productId}, -1)">−</button>
+          <span>${i.qty}</span>
+          <button onclick="changeQty(${i.productId}, 1)">+</button>
+        </div>
+        <button class="iconbtn right" onclick="changeQty(${i.productId}, -999)">🗑</button>
+      </div>`).join('');
+  }
+  const total = cart.total();
+  document.getElementById('cartTotals').innerHTML = `
+    <div class="line"><span>Items</span><span>${cart.count()}</span></div>
+    <div class="line"><span>Subtotal</span><span>${money(total)}</span></div>
+    <div class="line"><span>Delivery</span><span>${total >= 499 || total === 0 ? 'FREE' : money(40)}</span></div>
+    <div class="line grand"><span>Total payable</span><span>${money(total + (total >= 499 || total === 0 ? 0 : 40))}</span></div>`;
+  document.getElementById('checkoutBtn').disabled = !items.length;
+}
+
+function changeQty(id, delta) {
+  const item = cart.read().find(i => i.productId === id);
+  if (!item) return;
+  cart.setQty(id, item.qty + delta);
+  renderCart();
+}
+
+/* ---------------- checkout ---------------- */
+const modal = document.getElementById('checkoutModal');
+const modalBg = document.getElementById('modalBg');
+const closeModal = () => { modal.classList.remove('open'); modalBg.classList.remove('open'); };
+document.getElementById('closeModal').onclick = closeModal;
+modalBg.onclick = closeModal;
+
+document.getElementById('checkoutBtn').onclick = async () => {
+  const user = await me();
+  if (!user) {
+    toast('Please login to place the order', 'err');
+    setTimeout(() => (location.href = '/login.html?next=/index.html'), 700);
+    return;
+  }
+  if (user.role === 'admin') { toast('Admin cannot place customer orders — use the admin panel', 'err'); return; }
+  closeDrawer();
+  const total = cart.total() + (cart.total() >= 499 ? 0 : 40);
+  document.getElementById('checkoutBody').innerHTML = `
+    <div class="hint" style="margin-bottom:1rem">Logged in as <b>${esc(user.name)}</b> — ${esc(user.email)}</div>
+    <label class="field">Delivery address <span class="req">*</span>
+      <textarea id="coAddress">${esc(user.address || '')}</textarea>
+    </label>
+    <div class="form-grid">
+      <label class="field">Phone <span class="req">*</span><input id="coPhone" value="${esc(user.phone || '')}" /></label>
+      <label class="field">Payment mode
+        <select id="coPay">
+          <option value="cod">Cash on delivery</option>
+          <option value="upi">UPI / Online</option>
+          <option value="credit">Khata credit (udhaar)</option>
+        </select>
+      </label>
+    </div>
+    <div class="card tight" style="background:var(--paper);margin-bottom:1rem">
+      <div class="line spread"><span>Total payable</span><b style="font-size:1.15rem;color:var(--primary)">${money(total)}</b></div>
+    </div>
+    <button class="btn block" id="placeOrder">Place order — ${money(total)}</button>`;
+  modal.classList.add('open');
+  modalBg.classList.add('open');
+
+  document.getElementById('placeOrder').onclick = async (e) => {
+    e.target.disabled = true;
+    try {
+      const { order } = await API.post('/api/orders', {
+        items: cart.read().map(i => ({ productId: i.productId, qty: i.qty })),
+        address: document.getElementById('coAddress').value,
+        phone: document.getElementById('coPhone').value,
+        paymentMode: document.getElementById('coPay').value,
+      });
+      cart.clear();
+      renderCart();
+      closeModal();
+      toast(`Order ${order.orderNo} placed successfully!`, 'ok');
+      setTimeout(() => (location.href = '/account.html'), 900);
+    } catch (err) {
+      toast(err.message, 'err');
+      e.target.disabled = false;
+    }
+  };
+};
+
+/* ---------------- boot ---------------- */
+loadProducts();
+renderCart();
+paintHeader();
+</script>
+</body>
+</html>

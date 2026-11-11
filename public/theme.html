@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Look-book — Onyx &amp; Gold | VS Pharma</title>
+<style>
+  /* Self-contained look-book. Token values mirror public/css/style.css :root */
+  :root{
+    --black:#070707; --black-2:#0b0b0b; --black-3:#121212; --black-4:#171717;
+    --gold:#d4af37; --gold-light:#f2dc9b; --gold-deep:#a5822a;
+    --ivory:#f5efe3; --ivory-dim:#cdc5b6; --paper-light:#fbf7ee;
+    --muted:#8f897c; --line:#242424; --line-soft:#1a1a1a;
+    --ok:#5cb98a; --danger:#d97068;
+    --sans:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    --serif:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --shadow:0 1px 0 rgba(212,175,55,.06),0 30px 60px -46px #000;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);color:var(--ivory);line-height:1.65;
+    background-color:var(--black);
+    background-image:radial-gradient(1100px 620px at 82% -12%,rgba(212,175,55,.10),transparent 60%),
+                     radial-gradient(900px 520px at -6% 8%,rgba(212,175,55,.05),transparent 62%),
+                     linear-gradient(180deg,#080808,#050505 60%,#0a0a0a);}
+  .wrap{width:min(1080px,100% - 2.4rem);margin-inline:auto;padding:2.8rem 0 4.5rem}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;color:var(--ivory);margin:0 0 .5em;line-height:1.16;letter-spacing:-.02em}
+  h1{font-size:clamp(1.9rem,4.2vw,2.9rem)}
+  h1 em{color:var(--gold);font-style:italic}
+  h2{font-size:1.5rem} h3{font-size:1.05rem}
+  .overline{display:block;font-size:.64rem;font-weight:800;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+  .overline::after{content:"";display:block;width:46px;height:1px;margin-top:.55rem;background:linear-gradient(90deg,var(--gold),transparent)}
+  .muted{color:var(--muted)}
+  .grid{display:grid;gap:1.15rem}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+  section{margin-bottom:3rem}
+  .divider{height:1px;background:linear-gradient(90deg,var(--gold),transparent);border:0;margin:2.4rem 0}
+
+  .hero{position:relative;overflow:hidden;border-radius:20px;padding:3rem 2.4rem;
+    background:radial-gradient(700px 400px at 84% -16%,rgba(212,175,55,.22),transparent 62%),
+               linear-gradient(180deg,#0a0a0a,#060606 60%,#0b0b0b);
+    border:1px solid rgba(212,175,55,.22);box-shadow:0 60px 120px -70px #000}
+  .hero::before{content:"";position:absolute;inset:0;opacity:.6;pointer-events:none;
+    background-image:linear-gradient(rgba(212,175,55,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,55,.055) 1px,transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(560px 340px at 68% 12%,#000,transparent 76%);
+    -webkit-mask-image:radial-gradient(560px 340px at 68% 12%,#000,transparent 76%)}
+  .hero>*{position:relative}
+  .hero p{color:var(--ivory-dim);max-width:52ch}
+  .pill{display:inline-flex;gap:.5rem;align-items:center;background:rgba(212,175,55,.08);
+    border:1px solid rgba(212,175,55,.42);color:var(--gold-light);
+    font-size:.62rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+    padding:.38rem .95rem;border-radius:999px;margin-bottom:1.1rem}
+  .seal{position:absolute;right:2rem;top:1.9rem;width:98px;height:98px;border-radius:50%;
+    display:grid;place-items:center;align-content:center;text-align:center;
+    border:1px solid rgba(212,175,55,.55);box-shadow:inset 0 0 0 5px rgba(212,175,55,.1);
+    background:rgba(8,8,8,.6);color:var(--gold-light);
+    font-size:.52rem;font-weight:800;letter-spacing:.26em;text-transform:uppercase;line-height:1.6;
+    transform:rotate(-8deg)}
+  .seal b{display:block;font-family:var(--serif);font-size:1.3rem;font-weight:500;color:var(--gold);line-height:1;margin:.2rem 0}
+
+  .swatch{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,#131313,#0d0d0d);box-shadow:var(--shadow)}
+  .swatch .chipc{height:92px;border-bottom:1px solid var(--line)}
+  .swatch .meta{padding:.8rem .95rem;font-size:.78rem}
+  .swatch b{display:block;font-family:var(--serif);font-size:1rem;font-weight:500;color:var(--ivory)}
+  .swatch code{font-size:.72rem;color:var(--gold-deep);letter-spacing:.08em}
+  .swatch .note{font-size:.72rem;color:var(--muted);margin-top:.25rem}
+
+  .card{position:relative;background:linear-gradient(180deg,#131313,#0d0d0d);border:1px solid var(--line);
+    border-radius:18px;box-shadow:var(--shadow);padding:1.4rem}
+  .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 1px 0 rgba(212,175,55,.12)}
+  .stat{position:relative;overflow:hidden;background:linear-gradient(180deg,#131313,#0b0b0b);border:1px solid var(--line);
+    border-radius:14px;padding:1.1rem 1.15rem;box-shadow:var(--shadow)}
+  .stat::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),rgba(212,175,55,.05))}
+  .stat .lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;color:var(--gold-deep);font-weight:800}
+  .stat .val{font-family:var(--serif);font-size:1.55rem;color:var(--gold);margin-top:.25rem;font-weight:500}
+  .stat .sub{font-size:.72rem;color:var(--muted)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.3rem;border-radius:10px;
+    border:1px solid #8f6f1f;background:linear-gradient(180deg,var(--gold-light),var(--gold) 55%,#b8912a);color:#14100a;
+    font:inherit;font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;
+    box-shadow:0 12px 30px -16px rgba(212,175,55,.75),inset 0 1px 0 rgba(255,255,255,.45)}
+  .btn.ghost{background:transparent;color:var(--ivory);border-color:rgba(212,175,55,.38);box-shadow:none}
+  .btn.dark{background:linear-gradient(180deg,#1a1a1a,#0a0a0a);color:var(--ivory);border-color:#333;box-shadow:none}
+  .btn.sm{padding:.44rem .8rem;font-size:.62rem;border-radius:8px}
+
+  .chip{border:1px solid var(--line);background:#0d0d0d;color:var(--ivory-dim);border-radius:999px;
+    padding:.42rem .9rem;font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .chip.active{background:linear-gradient(180deg,var(--gold-light),var(--gold));border-color:var(--gold-deep);color:#14100a}
+  .badge{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:.2rem .5rem;border-radius:6px;border:1px solid transparent}
+  .badge.ok{background:rgba(92,185,138,.12);color:#74d3a5;border-color:rgba(92,185,138,.32)}
+  .badge.warn{background:rgba(212,175,55,.12);color:var(--gold-light);border-color:rgba(212,175,55,.38)}
+  .badge.bad{background:rgba(217,112,104,.12);color:#e78f88;border-color:rgba(217,112,104,.34)}
+
+  .product{position:relative;overflow:hidden;background:linear-gradient(180deg,#121212,#0b0b0b);border:1px solid var(--line);
+    border-radius:18px;padding:1rem;box-shadow:var(--shadow)}
+  .product::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .product .thumb{height:104px;border-radius:12px;display:grid;place-items:center;
+    background:radial-gradient(130px 76px at 72% 18%,rgba(212,175,55,.22),transparent 72%),linear-gradient(160deg,#131313,#080808);
+    border:1px solid rgba(212,175,55,.16);color:var(--gold);font-family:var(--serif);font-size:1.5rem;letter-spacing:.1em}
+  .product .cat{font-size:.58rem;text-transform:uppercase;letter-spacing:.26em;color:var(--gold-deep);font-weight:800}
+  .product .nm{font-family:var(--serif);font-size:1rem;color:var(--ivory);font-weight:500}
+  .product .price{font-family:var(--serif);font-size:1.1rem;color:var(--gold)}
+
+  table{width:100%;border-collapse:collapse;font-size:.82rem;background:#0b0b0b;border:1px solid var(--line);border-radius:12px;overflow:hidden;color:var(--ivory-dim)}
+  th{background:#121212;font-size:.6rem;text-transform:uppercase;letter-spacing:.18em;color:var(--gold-deep);font-weight:800;text-align:left;padding:.7rem .85rem;border-bottom:1px solid rgba(212,175,55,.2)}
+  td{padding:.68rem .85rem;border-bottom:1px solid var(--line-soft)}
+  td b{color:var(--ivory)}
+  tr:last-child td{border-bottom:0}
+
+  .paper{position:relative;background:linear-gradient(180deg,var(--paper-light),#f2ecdd);border:1px solid rgba(212,175,55,.55);
+    border-radius:18px;padding:1.7rem;color:#15120c;box-shadow:0 60px 120px -60px #000}
+  .paper h3{color:#0f0d08}
+  .paper .muted{color:#6d6455}
+  .paper .field{display:block;font-size:.62rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#6a6153;margin-bottom:.3rem}
+  .paper input{width:100%;font:inherit;font-size:.9rem;background:#fff;border:1px solid #ddd4c0;border-radius:10px;padding:.6rem .8rem;color:#15120c}
+
+  .sidebar-demo{background:linear-gradient(180deg,#0a0a0a,#050505);border:1px solid rgba(212,175,55,.16);border-radius:14px;padding:.8rem;display:grid;gap:.25rem;color:#9a9388;font-size:.79rem}
+  .sidebar-demo div{padding:.55rem .7rem;border-radius:9px;font-weight:600}
+  .sidebar-demo .active{background:rgba(212,175,55,.12);color:var(--gold-light);box-shadow:inset 2px 0 0 var(--gold)}
+  .footer-demo{background:linear-gradient(180deg,#080808,#040404);border:1px solid rgba(212,175,55,.2);border-radius:14px;padding:1.2rem 1.3rem;color:#948e82;font-size:.78rem}
+  .footer-demo b{color:var(--gold);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;display:block;margin-bottom:.35rem}
+  .note{font-size:.75rem;color:var(--muted);margin-top:.6rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="overline">Look-book · v4</span>
+  <h1>Onyx &amp; <em>Gold</em> — jet black luxury</h1>
+  <p class="muted" style="max-width:64ch">Three colours, nothing else: <b style="color:var(--gold)">jet black</b> for depth, <b style="color:var(--gold)">gold</b> for everything precious, <b style="color:var(--ivory)">pearl ivory</b> for reading. This sheet mirrors <code style="color:var(--gold-deep)">public/css/style.css</code>.</p>
+
+  <section class="hero">
+    <div class="seal">Est.<b>2026</b>Amritsar</div>
+    <span class="pill">100% genuine medicines · Since 2026</span>
+    <h1>Your trusted neighbourhood <em>pharmacy</em>, now online.</h1>
+    <p>Genuine medicines, health devices and daily essentials — every rupee recorded in ₹, every bill in gold leaf.</p>
+    <div class="row" style="margin-top:1.4rem">
+      <button class="btn">Browse Medicines ›</button>
+      <button class="btn ghost">Customer Login</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="overline">The triad</span>
+    <h2>Three premium colours</h2>
+    <div class="grid g3">
+      <div class="swatch"><div class="chipc" style="background:linear-gradient(160deg,#1a1a1a,#0b0b0b 55%,#050505)"></div>
+        <div class="meta"><b>1 · Jet Black</b><br /><code>#070707 → #121212</code><div class="note">Page, hero, sidebar, footer, cards</div></div></div>
+      <div class="swatch"><div class="chipc" style="background:linear-gradient(160deg,#f2dc9b,#d4af37 55%,#a5822a)"></div>
+        <div class="meta"><b>2 · Gold</b><br /><code>#D4AF37</code><div class="note">Accents, CTA, hairlines, numerals</div></div></div>
+      <div class="swatch"><div class="chipc" style="background:linear-gradient(160deg,#fbf7ee,#f5efe3 60%,#e7dfcd)"></div>
+        <div class="meta"><b>3 · Pearl Ivory</b><br /><code>#F5EFE3</code><div class="note">Type on black · ivory cards</div></div></div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <section>
+    <span class="overline">Interface</span>
+    <h2>Controls</h2>
+    <div class="row" style="margin-bottom:1.2rem">
+      <button class="btn">Primary action</button>
+      <button class="btn ghost">Ghost</button>
+      <button class="btn dark">Dark</button>
+      <button class="btn sm">Small</button>
+      <span class="chip active">All</span><span class="chip">Tablet</span><span class="chip">Syrup</span>
+    </div>
+    <div class="row" style="margin-bottom:1.4rem">
+      <span class="badge ok">Delivered</span>
+      <span class="badge warn">Credit</span>
+      <span class="badge bad">Payable</span>
+    </div>
+
+    <div class="grid g4" style="margin-bottom:1.4rem">
+      <div class="stat"><div class="lbl">Total revenue</div><div class="val">₹6,190</div><div class="sub">counter + online</div></div>
+      <div class="stat"><div class="lbl">Customer dues</div><div class="val">₹820</div><div class="sub">credit sales</div></div>
+      <div class="stat"><div class="lbl">Supplier payable</div><div class="val" style="color:var(--danger)">₹2,110</div><div class="sub">debit purchases</div></div>
+      <div class="stat"><div class="lbl">Stock value</div><div class="val">₹2.07L</div><div class="sub">24 items</div></div>
+    </div>
+
+    <div class="grid g3" style="margin-bottom:1.4rem">
+      <div class="product">
+        <div class="thumb">DO</div>
+        <span class="cat">Tablet</span>
+        <div class="nm">Paracetamol 650mg</div>
+        <div class="muted" style="font-size:.74rem">Dolo · 10 tablets</div>
+        <div class="row" style="justify-content:space-between;margin-top:.45rem">
+          <span class="price">₹32.00</span>
+          <button class="btn sm">Add</button>
+        </div>
+      </div>
+      <div class="sidebar-demo">
+        <div>📊 Dashboard</div>
+        <div class="active">🧾 Credit / Cash Sales</div>
+        <div>🛒 Goods Purchased</div>
+        <div>📒 Credit / Debit Ledger</div>
+      </div>
+      <div class="card">
+        <h3>Credit / debit khata</h3>
+        <p class="muted" style="font-size:.8rem;margin:0">Credit = sale on udhaar · Debit = payment received. The customer always sees the running balance.</p>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Invoice</th><th>Customer</th><th style="text-align:right">Total</th><th style="text-align:right">Due</th><th>Mode</th></tr></thead>
+      <tbody>
+        <tr><td><b>INV-2026-0001</b></td><td>Rahul Sharma</td><td style="text-align:right">₹182.00</td><td style="text-align:right"><span class="badge warn">₹82.00</span></td><td>credit</td></tr>
+        <tr><td><b>INV-2026-0002</b></td><td>Walk-in Customer</td><td style="text-align:right">₹132.00</td><td style="text-align:right">—</td><td>cash</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <span class="overline">3rd colour as a surface</span>
+    <h2>The ivory card</h2>
+    <div class="grid g3">
+      <div class="paper">
+        <h3>Customer login</h3>
+        <p class="muted" style="font-size:.8rem">Ivory invitation cards carry every form — maximum contrast against jet black.</p>
+        <label class="field">Email</label>
+        <input value="rahul@example.com" readonly />
+        <div style="margin-top:1rem"><button class="btn" style="width:100%">Login</button></div>
+      </div>
+      <div class="card">
+        <h3>Why it works</h3>
+        <p class="muted" style="font-size:.8rem;margin:0">Black absorbs light, gold reflects it, ivory reads cleanly. Three colours only — no teal, no blue, no grey-blue anywhere.</p>
+      </div>
+      <div class="footer-demo">
+        <b>VS Pharma &amp; Medical Store</b>
+        © 2026 VS Pharma &amp; Medical Store · Drug Licence PB-AMR-2026-1188 · Prices in ₹ (INR)
+      </div>
+    </div>
+  </section>
+
+  <p class="note">Alternate triads documented in the stylesheet: <b>Onyx &amp; Gold</b> (current) · <b>Obsidian &amp; Champagne</b> #0a0a0c / #cbb47f / #f3efe6 · <b>Espresso &amp; Brass</b> #120d0a / #c69a52 / #f4ece1.</p>
+</div>
+</body>
+</html>

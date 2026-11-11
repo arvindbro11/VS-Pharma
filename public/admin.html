@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel — VS Pharma &amp; Medical Store</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23070707'/><path d='M42 22h16v20h20v16H58v20H42V58H22V42h20z' fill='%23d4af37'/></svg>" />
+<link rel="stylesheet" href="/css/style.css?v=2026-11-11-onyx4" />
+</head>
+<body>
+
+<!-- ============ LOGIN GATE ============ -->
+<div id="gate" class="auth-main" style="min-height:100vh;background:radial-gradient(900px 500px at 75% -10%, rgba(212,175,55,.18), transparent 62%), radial-gradient(700px 400px at 10% 110%, rgba(212,175,55,.08), transparent 60%), linear-gradient(165deg,#0d0d0d,#070707 45%,#0a0a0a)">
+  <div class="auth-box">
+    <div class="card paper-card">
+      <div class="logo" style="margin-bottom:1rem"><span class="mark">VS</span><span>VS Pharma — Admin<small>Store management panel</small></span></div>
+      <span class="overline">Store Management</span>
+      <h2 style="margin-bottom:.2rem">Admin login</h2>
+      <p class="muted" style="font-size:.85rem">Records of sales, purchases, credit–debit and customers.</p>
+      <form id="gateForm">
+        <label class="field">Email <span class="req">*</span><input name="email" type="email" value="admin@vspharmacy.in" required /></label>
+        <label class="field">Password <span class="req">*</span><input name="password" type="password" value="admin123" required /></label>
+        <button class="btn block dark" type="submit">Enter admin panel</button>
+      </form>
+      <p class="hint" style="margin-top:1rem">Demo admin — <b>admin@vspharmacy.in</b> / <b>admin123</b></p>
+      <p class="center muted" style="font-size:.8rem;margin-top:.8rem"><a href="/">← Back to store</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PANEL ============ -->
+<div class="admin-shell hidden" id="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark">VS</span><div>VS Pharma<small>Admin Panel</small></div></div>
+    <button class="tab active" data-panel="dashboard">📊 Dashboard</button>
+    <button class="tab" data-panel="orders">📦 Customer Orders</button>
+    <button class="tab" data-panel="sales">🧾 Credit / Cash Sales</button>
+    <button class="tab" data-panel="purchases">🛒 Goods Purchased</button>
+    <button class="tab" data-panel="products">💊 Medicines &amp; Stock</button>
+    <button class="tab" data-panel="users">👥 Customers</button>
+    <button class="tab" data-panel="ledger">📒 Credit / Debit Ledger</button>
+    <div class="spacer"></div>
+    <button class="tab" onclick="location.href='/'">🏪 View storefront</button>
+    <button class="tab" onclick="logout('/admin.html')">🚪 Logout</button>
+    <div class="who" id="who"></div>
+  </aside>
+
+  <main class="admin-main">
+    <!-- DASHBOARD -->
+    <section class="panel active" id="panel-dashboard">
+      <div class="admin-head">
+        <div><h2>Dashboard</h2><p class="muted" style="margin:0">Store overview for 2026 — all amounts in ₹</p></div>
+        <button class="btn ghost sm" onclick="refreshAll()">⟳ Refresh</button>
+      </div>
+      <div id="dashBody" class="empty">Loading…</div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="panel" id="panel-orders">
+      <div class="admin-head"><h2>Customer orders (website)</h2><button class="btn ghost sm" onclick="loadOrders()">⟳ Refresh</button></div>
+      <div id="ordersBody" class="empty">Loading…</div>
+    </section>
+
+    <!-- SALES -->
+    <section class="panel" id="panel-sales">
+      <div class="admin-head">
+        <div><h2>Credit / Cash sales</h2><p class="muted" style="margin:0">Counter bills — credit sales are posted to the ledger automatically</p></div>
+        <div class="row" style="gap:.5rem">
+          <button class="btn ghost sm" onclick="loadSales()">⟳ Refresh</button>
+          <button class="btn sm" onclick="openSaleModal()">+ New sale</button>
+        </div>
+      </div>
+      <div id="salesBody" class="empty">Loading…</div>
+    </section>
+
+    <!-- PURCHASES -->
+    <section class="panel" id="panel-purchases">
+      <div class="admin-head">
+        <div><h2>Goods purchased (debit)</h2><p class="muted" style="margin:0">Stock bought from suppliers — credit purchases increase supplier payable</p></div>
+        <div class="row" style="gap:.5rem">
+          <button class="btn ghost sm" onclick="loadPurchases()">⟳ Refresh</button>
+          <button class="btn sm" onclick="openPurchaseModal()">+ New purchase</button>
+        </div>
+      </div>
+      <div id="purchasesBody" class="empty">Loading…</div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="panel" id="panel-products">
+      <div class="admin-head">
+        <h2>Medicines &amp; stock</h2>
+        <div class="row" style="gap:.5rem">
+          <button class="btn ghost sm" onclick="loadProducts()">⟳ Refresh</button>
+          <button class="btn sm" onclick="openProductModal()">+ Add medicine</button>
+        </div>
+      </div>
+      <div id="productsBody" class="empty">Loading…</div>
+    </section>
+
+    <!-- USERS -->
+    <section class="panel" id="panel-users">
+      <div class="admin-head"><h2>Customers</h2><button class="btn ghost sm" onclick="loadUsers()">⟳ Refresh</button></div>
+      <div id="usersBody" class="empty">Loading…</div>
+    </section>
+
+    <!-- LEDGER -->
+    <section class="panel" id="panel-ledger">
+      <div class="admin-head">
+        <div><h2>Credit / Debit ledger</h2><p class="muted" style="margin:0">Customer udhaar and supplier payables — one register, two parties</p></div>
+        <div class="row" style="gap:.5rem">
+          <button class="btn ghost sm" onclick="loadLedger()">⟳ Refresh</button>
+          <button class="btn sm" onclick="openLedgerModal()">+ Add entry</button>
+        </div>
+      </div>
+      <div id="ledgerBody" class="empty">Loading…</div>
+    </section>
+  </main>
+</div>
+
+<!-- modal -->
+<div class="modal-bg" id="modalBg"></div>
+<div class="modal" id="modal" style="width:min(720px,calc(100% - 2rem))">
+  <header><h3 id="modalTitle">Title</h3><button class="iconbtn" onclick="closeModal()">✕</button></header>
+  <div id="modalBody"></div>
+</div>
+
+<script src="/js/common.js?v=2026-11-11-onyx4"></script>
+<script>
+const state = { user: null, products: [], users: [], stats: null, ledger: null };
+
+/* ---------------- modal helpers ---------------- */
+const modal = document.getElementById('modal');
+const modalBg = document.getElementById('modalBg');
+function openModal(title, html) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  modal.classList.add('open');
+  modalBg.classList.add('open');
+}
+function closeModal() { modal.classList.remove('open'); modalBg.classList.remove('open'); }
+modalBg.onclick = closeModal;
+
+/* ---------------- boot ---------------- */
+async function boot() {
+  const user = await me(true);
+  if (user && user.role === 'admin') {
+    state.user = user;
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('shell').classList.remove('hidden');
+    document.getElementById('who').textContent = 'Signed in: ' + user.name + ' · Onyx & Gold v4';
+    await Promise.all([loadStats(), loadProducts(true), loadUsers(true)]);
+  } else {
+    document.getElementById('gate').classList.remove('hidden');
+    document.getElementById('shell').classList.add('hidden');
+  }
+}
+
+document.getElementById('gateForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const fd = Object.fromEntries(new FormData(e.target));
+  try {
+    const { user } = await API.post('/api/auth/login', fd);
+    if (user.role !== 'admin') { toast('This account is not an admin', 'err'); return; }
+    clearMe();
+    toast('Welcome back, ' + user.name, 'ok');
+    boot();
+  } catch (err) { toast(err.message, 'err'); }
+};
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll('.sidebar .tab[data-panel]').forEach((btn) => {
+  btn.onclick = () => {
+    document.querySelectorAll('.sidebar .tab[data-panel]').forEach((b) => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    const map = { dashboard: loadStats, orders: loadOrders, sales: loadSales, purchases: loadPurchases, products: () => loadProducts(), users: () => loadUsers(), ledger: loadLedger };
+    if (map[btn.dataset.panel]) map[btn.dataset.panel]();
+  };
+});
+
+function refreshAll() { loadStats(); loadOrders(); loadSales(); loadPurchases(); loadProducts(); loadUsers(); loadLedger(); }
+
+/* ================= DASHBOARD ================= */
+async function loadStats() {
+  const box = document.getElementById('dashBody');
+  try {
+    const { stats, lowStockItems, recentSales, recentOrders } = await API.get('/api/admin/stats');
+    state.stats = stats;
+    const max = Math.max(1, ...stats.trend.map((t) => t.total));
+    box.className = '';
+    box.innerHTML = `
+      <div class="grid g4">
+        <div class="stat"><div class="lbl">Total revenue</div><div class="val">${money0(stats.revenue)}</div><div class="sub">counter + online (all time)</div></div>
+        <div class="stat amber"><div class="lbl">Customer dues (credit sale)</div><div class="val">${money0(stats.customerDue)}</div><div class="sub">money to collect from customers</div></div>
+        <div class="stat red"><div class="lbl">Supplier payable (debit)</div><div class="val">${money0(stats.supplierDue)}</div><div class="sub">money to pay for goods bought</div></div>
+        <div class="stat blue"><div class="lbl">Today's sale</div><div class="val">${money0(stats.todaySale)}</div><div class="sub">${fmtDate(new Date())}</div></div>
+      </div>
+
+      <div class="grid g4" style="margin-top:1rem">
+        <div class="stat"><div class="lbl">Counter sales</div><div class="val">${money0(stats.counterSale)}</div><div class="sub">${stats.salesCount} bills</div></div>
+        <div class="stat"><div class="lbl">Online orders</div><div class="val">${money0(stats.onlineSale)}</div><div class="sub">${stats.ordersPending} pending</div></div>
+        <div class="stat"><div class="lbl">Goods purchased</div><div class="val">${money0(stats.purchaseTotal)}</div><div class="sub">${stats.purchaseCount} supplier bills</div></div>
+        <div class="stat"><div class="lbl">Stock value</div><div class="val">${money0(stats.stockValue)}</div><div class="sub">${stats.products} items • ${stats.lowStock} low stock</div></div>
+      </div>
+
+      <div class="grid g2" style="margin-top:1rem;align-items:start">
+        <div class="card">
+          <h3>Sales trend (last 6 months)</h3>
+          ${stats.trend.length ? `<div class="bars">${stats.trend.map((t) => `
+            <div class="b" title="${t.month}: ${money(t.total)}">
+              <small>${money0(t.total)}</small>
+              <div class="bar" style="height:${Math.round((t.total / max) * 100)}%"></div>
+              <small>${t.month.slice(2)}</small>
+            </div>`).join('')}</div>` : '<p class="muted">No sales recorded yet.</p>'}
+        </div>
+        <div class="card">
+          <h3>Low stock alert</h3>
+          ${lowStockItems.length ? `<table><tbody>${lowStockItems.map((p) => `
+            <tr><td>${esc(p.name)}<br /><small class="muted">${esc(p.brand)}</small></td>
+            <td class="num"><span class="badge ${p.stock === 0 ? 'bad' : 'warn'}">${p.stock} left</span></td></tr>`).join('')}</tbody></table>`
+            : '<p class="muted">All items are well stocked. 👍</p>'}
+        </div>
+      </div>
+
+      <div class="grid g2" style="margin-top:1rem;align-items:start">
+        <div class="card">
+          <h3>Recent counter sales</h3>
+          ${recentSales.length ? `<table><tbody>${recentSales.map((s) => `
+            <tr><td>${esc(s.invoiceNo)}<br /><small class="muted">${esc(s.customerName)}</small></td>
+            <td class="num">${money(s.total)}<br /><small class="muted">${fmtDate(s.date)}</small></td></tr>`).join('')}</tbody></table>` : '<p class="muted">No counter sales yet.</p>'}
+        </div>
+        <div class="card">
+          <h3>Recent online orders</h3>
+          ${recentOrders.length ? `<table><tbody>${recentOrders.map((o) => `
+            <tr><td>${esc(o.orderNo)}<br /><small class="muted">${esc(o.customerName)}</small></td>
+            <td class="num">${money(o.total)}<br /><small class="muted">${esc(o.status)}</small></td></tr>`).join('')}</tbody></table>` : '<p class="muted">No online orders yet.</p>'}
+        </div>
+      </div>`;
+  } catch (e) {
+    box.className = 'empty';
+    box.textContent = 'Could not load dashboard: ' + e.message;
+  }
+}
+
+/* ================= PRODUCTS ================= */
+async function loadProducts(silent) {
+  try {
+    const { products } = await API.get('/api/products');
+    state.products = products;
+    if (silent) return;
+    const box = document.getElementById('productsBody');
+    box.className = '';
+    box.innerHTML = `<div class="table-scroll"><table>
+      <thead><tr><th>Medicine</th><th>Category</th><th>Pack</th><th class="num">Selling ₹</th><th class="num">MRP ₹</th><th class="num">Stock</th><th>Actions</th></tr></thead>
+      <tbody>${products.map((p) => `<tr>
+        <td><b>${esc(p.name)}</b><br /><small class="muted">${esc(p.brand || '')}${p.prescription ? ' • Rx' : ''}</small></td>
+        <td>${esc(p.category)}</td>
+        <td>${esc(p.packSize || '-')}</td>
+        <td class="num">${money(p.price)}</td>
+        <td class="num">${money(p.mrp)}</td>
+        <td class="num"><span class="badge ${p.stock === 0 ? 'bad' : p.stock <= 20 ? 'warn' : 'ok'}">${p.stock}</span></td>
+        <td class="nowrap">
+          <button class="btn ghost sm" onclick="openProductModal(${p.id})">Edit</button>
+          <button class="btn danger sm" onclick="deleteProduct(${p.id})">Del</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+function openProductModal(id) {
+  const p = state.products.find((x) => x.id === id) || {};
+  openModal(id ? 'Edit medicine' : 'Add medicine', `
+    <div class="form-grid">
+      <label class="field full">Medicine name <span class="req">*</span><input id="f_name" value="${esc(p.name || '')}" /></label>
+      <label class="field">Brand<input id="f_brand" value="${esc(p.brand || '')}" /></label>
+      <label class="field">Category<input id="f_cat" value="${esc(p.category || 'Tablet')}" /></label>
+      <label class="field">Pack size<input id="f_pack" value="${esc(p.packSize || '10 tablets')}" /></label>
+      <label class="field">Stock quantity<input id="f_stock" type="number" min="0" value="${p.stock ?? 0}" /></label>
+      <label class="field">Selling price ₹ <span class="req">*</span><input id="f_price" type="number" min="0" step="0.01" value="${p.price ?? ''}" /></label>
+      <label class="field">MRP ₹<input id="f_mrp" type="number" min="0" step="0.01" value="${p.mrp ?? ''}" /></label>
+      <label class="field full"><span><input type="checkbox" id="f_rx" style="width:auto" ${p.prescription ? 'checked' : ''} /> Prescription required</span></label>
+    </div>
+    <button class="btn block" id="saveProduct">${id ? 'Save changes' : 'Add medicine'}</button>`);
+
+  document.getElementById('saveProduct').onclick = async () => {
+    const body = {
+      name: document.getElementById('f_name').value,
+      brand: document.getElementById('f_brand').value,
+      category: document.getElementById('f_cat').value,
+      packSize: document.getElementById('f_pack').value,
+      stock: Number(document.getElementById('f_stock').value),
+      price: Number(document.getElementById('f_price').value),
+      mrp: Number(document.getElementById('f_mrp').value || document.getElementById('f_price').value),
+      prescription: document.getElementById('f_rx').checked,
+    };
+    try {
+      if (id) await API.put('/api/admin/products/' + id, body);
+      else await API.post('/api/admin/products', body);
+      toast('Medicine saved', 'ok');
+      closeModal();
+      await loadProducts(true);
+      loadProducts();
+      loadStats();
+    } catch (e) { toast(e.message, 'err'); }
+  };
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this medicine from stock?')) return;
+  try {
+    await API.del('/api/admin/products/' + id);
+    toast('Medicine deleted', 'ok');
+    await loadProducts(true); loadProducts();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+/* ================= ORDERS ================= */
+function statusBadge(s) {
+  const map = { pending: 'warn', packed: 'info', delivered: 'ok', cancelled: 'bad' };
+  return `<span class="badge ${map[s] || 'muted'}">${esc(s)}</span>`;
+}
+
+async function loadOrders() {
+  const box = document.getElementById('ordersBody');
+  try {
+    const { orders } = await API.get('/api/admin/orders');
+    box.className = '';
+    box.innerHTML = `<div class="table-scroll"><table>
+      <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th class="num">Total</th><th>Payment</th><th>Status</th><th>Update</th></tr></thead>
+      <tbody>${orders.length ? orders.map((o) => `<tr>
+        <td><b>${esc(o.orderNo)}</b><br /><small class="muted">${fmtDateTime(o.date)}</small></td>
+        <td>${esc(o.customerName)}<br /><small class="muted">${esc(o.phone)}</small></td>
+        <td><small>${o.items.map((i) => `${esc(i.name)} × ${i.qty}`).join('<br />')}</small></td>
+        <td class="num">${money(o.total)}</td>
+        <td><span class="badge ${o.paymentMode === 'credit' ? 'warn' : 'muted'}">${o.paymentMode}</span></td>
+        <td>${statusBadge(o.status)}</td>
+        <td><select onchange="setOrderStatus(${o.id}, this.value)" style="min-width:120px">
+          ${['pending', 'packed', 'delivered', 'cancelled'].map((s) => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
+        </select></td>
+      </tr>`).join('') : `<tr><td colspan="7"><div class="empty">No online orders yet.</div></td></tr>`}</tbody>
+    </table></div>`;
+  } catch (e) { box.className = 'empty'; box.textContent = e.message; }
+}
+
+async function setOrderStatus(id, status) {
+  try { await API.put(`/api/admin/orders/${id}/status`, { status }); toast('Order marked ' + status, 'ok'); loadOrders(); loadStats(); }
+  catch (e) { toast(e.message, 'err'); }
+}
+
+/* ================= SALES ================= */
+async function loadSales() {
+  const box = document.getElementById('salesBody');
+  try {
+    const { sales } = await API.get('/api/admin/sales');
+    box.className = '';
+    const totalCredit = sales.filter((s) => s.due > 0).reduce((a, s) => a + s.due, 0);
+    box.innerHTML = `
+      <div class="grid g4" style="margin-bottom:1rem">
+        <div class="stat"><div class="lbl">Bills</div><div class="val">${sales.length}</div></div>
+        <div class="stat"><div class="lbl">Total billed</div><div class="val">${money0(sales.reduce((a, s) => a + s.total, 0))}</div></div>
+        <div class="stat amber"><div class="lbl">On credit (due)</div><div class="val">${money0(totalCredit)}</div></div>
+        <div class="stat"><div class="lbl">Collected</div><div class="val">${money0(sales.reduce((a, s) => a + s.paid, 0))}</div></div>
+      </div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Invoice</th><th>Customer</th><th>Items</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Due</th><th>Mode</th><th>Date</th></tr></thead>
+        <tbody>${sales.length ? sales.map((s) => `<tr>
+          <td><b>${esc(s.invoiceNo)}</b>${s.note ? `<br /><small class="muted">${esc(s.note)}</small>` : ''}</td>
+          <td>${esc(s.customerName)}${s.phone ? `<br /><small class="muted">${esc(s.phone)}</small>` : ''}</td>
+          <td><small>${s.items.map((i) => `${esc(i.name)} × ${i.qty}`).join('<br />')}</small></td>
+          <td class="num">${money(s.total)}</td>
+          <td class="num">${money(s.paid)}</td>
+          <td class="num">${s.due > 0 ? `<span class="badge warn">${money(s.due)}</span>` : '-'}</td>
+          <td><span class="badge ${s.paymentMode === 'credit' ? 'warn' : 'muted'}">${esc(s.paymentMode)}</span></td>
+          <td class="nowrap"><small>${fmtDate(s.date)}</small></td>
+        </tr>`).join('') : `<tr><td colspan="8"><div class="empty">No counter sales recorded yet. Use “+ New sale”.</div></td></tr>`}</tbody>
+      </table></div>`;
+  } catch (e) { box.className = 'empty'; box.textContent = e.message; }
+}
+
+function productOptions(selected) {
+  return state.products.map((p) => `<option value="${p.id}" data-price="${p.price}" ${selected === p.id ? 'selected' : ''}>${esc(p.name)} — ${money(p.price)} (stock ${p.stock})</option>`).join('');
+}
+
+function openSaleModal() {
+  const custOpts = `<option value="">Walk-in customer</option>` + state.users.filter((u) => u.role === 'customer').map((u) => `<option value="${u.id}">${esc(u.name)} — ${esc(u.email)}</option>`).join('');
+  openModal('New counter sale', `
+    <div class="form-grid">
+      <label class="field">Customer
+        <select id="s_customer" onchange="toggleWalkin()">${custOpts}</select>
+      </label>
+      <label class="field" id="walkinWrap">Customer name (for credit)<input id="s_name" placeholder="Name on khata" /></label>
+      <label class="field">Phone<input id="s_phone" placeholder="optional" /></label>
+      <label class="field">Payment mode
+        <select id="s_mode">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="credit">Credit (udhaar)</option>
+        </select>
+      </label>
+    </div>
+    <h4 style="margin:.6rem 0 .4rem">Items</h4>
+    <div id="s_items" style="display:grid;gap:.5rem"></div>
+    <button class="btn ghost sm" style="margin-top:.5rem" onclick="addSaleRow()">+ Add item</button>
+    <div class="form-grid" style="margin-top:.9rem">
+      <label class="field">Discount ₹<input id="s_discount" type="number" min="0" value="0" oninput="calcSale()" /></label>
+      <label class="field">Amount paid now ₹<input id="s_paid" type="number" min="0" value="0" oninput="calcSale()" /></label>
+      <label class="field full">Note<input id="s_note" placeholder="e.g. monthly BP medicines" /></label>
+    </div>
+    <div class="card tight" style="background:var(--paper);margin-bottom:.9rem" id="s_summary"></div>
+    <button class="btn block" id="saveSale">Save sale &amp; post to ledger</button>`);
+
+  addSaleRow(); addSaleRow();
+  document.getElementById('s_mode').onchange = calcSale;
+  document.getElementById('saveSale').onclick = saveSale;
+  toggleWalkin(); calcSale();
+}
+
+function toggleWalkin() {
+  const v = document.getElementById('s_customer').value;
+  document.getElementById('walkinWrap').style.display = v ? 'none' : 'block';
+}
+
+function addSaleRow() {
+  const box = document.getElementById('s_items');
+  const row = document.createElement('div');
+  row.className = 'row sale-row';
+  row.style.cssText = 'gap:.4rem;flex-wrap:nowrap';
+  row.innerHTML = `
+    <select class="i_prod" style="flex:1" onchange="calcSale()">${productOptions()}</select>
+    <input class="i_qty" type="number" min="1" value="1" style="width:80px" oninput="calcSale()" />
+    <span class="i_amt" style="width:90px;text-align:right;font-weight:700">₹0.00</span>
+    <button class="iconbtn" onclick="this.parentElement.remove();calcSale()">✕</button>`;
+  box.appendChild(row);
+}
+
+function readSaleRows() {
+  return [...document.querySelectorAll('#s_items .sale-row')].map((r) => {
+    const sel = r.querySelector('.i_prod');
+    const qty = Number(r.querySelector('.i_qty').value) || 1;
+    const opt = sel.selectedOptions[0];
+    const price = Number(opt?.dataset.price || 0);
+    r.querySelector('.i_amt').textContent = money(price * qty);
+    return { productId: Number(sel.value), qty, price, name: opt?.textContent || '' };
+  });
+}
+
+function calcSale() {
+  const rows = readSaleRows();
+  const subtotal = rows.reduce((s, r) => s + r.price * r.qty, 0);
+  const discount = Number(document.getElementById('s_discount').value) || 0;
+  const total = Math.max(0, subtotal - discount);
+  const mode = document.getElementById('s_mode').value;
+  const paidEl = document.getElementById('s_paid');
+  if (mode !== 'credit') paidEl.value = total.toFixed(2);
+  const paid = Number(paidEl.value) || 0;
+  const due = Math.max(0, total - paid);
+  document.getElementById('s_summary').innerHTML = `
+    <div class="spread"><span class="muted">Subtotal</span><b>${money(subtotal)}</b></div>
+    <div class="spread"><span class="muted">Discount</span><b>− ${money(discount)}</b></div>
+    <div class="spread"><span><b>Bill total</b></span><b style="font-size:1.15rem;color:var(--primary)">${money(total)}</b></div>
+    <div class="spread"><span class="muted">Paid now</span><b>${money(paid)}</b></div>
+    <div class="spread"><span class="muted">Balance ${due > 0 ? '(posted as credit in ledger)' : ''}</span><b style="color:${due > 0 ? 'var(--warn)' : 'var(--ok)'}">${money(due)}</b></div>`;
+}
+
+async function saveSale() {
+  const rows = readSaleRows().filter((r) => r.productId);
+  if (!rows.length) return toast('Add at least one item', 'err');
+  const body = {
+    customerId: document.getElementById('s_customer').value || null,
+    customerName: document.getElementById('s_name').value,
+    phone: document.getElementById('s_phone').value,
+    items: rows.map((r) => ({ productId: r.productId, qty: r.qty })),
+    discount: Number(document.getElementById('s_discount').value) || 0,
+    paymentMode: document.getElementById('s_mode').value,
+    paidAmount: Number(document.getElementById('s_paid').value) || 0,
+    note: document.getElementById('s_note').value,
+  };
+  try {
+    const { sale } = await API.post('/api/admin/sales', body);
+    toast('Sale ' + sale.invoiceNo + ' saved', 'ok');
+    closeModal();
+    await loadProducts(true);
+    loadSales(); loadStats(); loadLedger(); loadProducts();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+/* ================= PURCHASES ================= */
+async function loadPurchases() {
+  const box = document.getElementById('purchasesBody');
+  try {
+    const { purchases } = await API.get('/api/admin/purchases');
+    state.purchases = purchases;
+    box.className = '';
+    const dueTotal = purchases.reduce((a, p) => a + p.due, 0);
+    box.innerHTML = `
+      <div class="grid g4" style="margin-bottom:1rem">
+        <div class="stat"><div class="lbl">Supplier bills</div><div class="val">${purchases.length}</div></div>
+        <div class="stat"><div class="lbl">Goods value</div><div class="val">${money0(purchases.reduce((a, p) => a + p.total, 0))}</div></div>
+        <div class="stat red"><div class="lbl">Payable (debit)</div><div class="val">${money0(dueTotal)}</div></div>
+        <div class="stat"><div class="lbl">Paid</div><div class="val">${money0(purchases.reduce((a, p) => a + p.paid, 0))}</div></div>
+      </div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Bill</th><th>Supplier</th><th>Items</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Due</th><th>Date</th><th></th></tr></thead>
+        <tbody>${purchases.length ? purchases.map((p) => `<tr>
+          <td><b>${esc(p.billNo)}</b></td>
+          <td>${esc(p.supplier)}${p.supplierPhone ? `<br /><small class="muted">${esc(p.supplierPhone)}</small>` : ''}</td>
+          <td><small>${p.items.map((i) => `${esc(i.name)} × ${i.qty} @ ${money(i.cost)}`).join('<br />')}</small></td>
+          <td class="num">${money(p.total)}</td>
+          <td class="num">${money(p.paid)}</td>
+          <td class="num">${p.due > 0 ? `<span class="badge bad">${money(p.due)}</span>` : '-'}</td>
+          <td class="nowrap"><small>${fmtDate(p.date)}</small></td>
+          <td>${p.due > 0 ? `<button class="btn ghost sm" onclick="openPaySupplier(${p.id})">Pay</button>` : ''}</td>
+        </tr>`).join('') : `<tr><td colspan="8"><div class="empty">No purchases recorded. Use “+ New purchase”.</div></td></tr>`}</tbody>
+      </table></div>`;
+  } catch (e) { box.className = 'empty'; box.textContent = e.message; }
+}
+
+function openPurchaseModal() {
+  openModal('New goods purchase (debit)', `
+    <div class="form-grid">
+      <label class="field">Supplier name <span class="req">*</span><input id="p_supplier" placeholder="e.g. Sun Pharma Distributors" /></label>
+      <label class="field">Supplier phone<input id="p_phone" placeholder="optional" /></label>
+      <label class="field">Bill number<input id="p_bill" placeholder="auto-generated if blank" /></label>
+      <label class="field">Payment mode
+        <select id="p_mode" onchange="calcPurchase()">
+          <option value="credit">Credit (pay later)</option>
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+        </select>
+      </label>
+    </div>
+    <h4 style="margin:.6rem 0 .4rem">Items purchased</h4>
+    <div id="p_items" style="display:grid;gap:.5rem"></div>
+    <button class="btn ghost sm" style="margin-top:.5rem" onclick="addPurchaseRow()">+ Add item</button>
+    <div class="form-grid" style="margin-top:.9rem">
+      <label class="field">Amount paid now ₹<input id="p_paid" type="number" min="0" value="0" oninput="calcPurchase()" /></label>
+      <label class="field">Note<input id="p_note" placeholder="e.g. antibiotic stock" /></label>
+    </div>
+    <div class="card tight" style="background:var(--paper);margin-bottom:.9rem" id="p_summary"></div>
+    <button class="btn block" id="savePurchase">Save purchase &amp; post debit</button>`);
+
+  addPurchaseRow(); addPurchaseRow();
+  document.getElementById('savePurchase').onclick = savePurchase;
+  calcPurchase();
+}
+
+function addPurchaseRow() {
+  const box = document.getElementById('p_items');
+  const row = document.createElement('div');
+  row.className = 'row pur-row';
+  row.style.cssText = 'gap:.4rem;flex-wrap:nowrap';
+  row.innerHTML = `
+    <input class="p_name" placeholder="Item / medicine name" style="flex:1.4" list="medList" />
+    <input class="p_qty" type="number" min="1" value="10" style="width:80px" oninput="calcPurchase()" title="Quantity" />
+    <input class="p_cost" type="number" min="0" step="0.01" placeholder="Cost ₹" style="width:100px" oninput="calcPurchase()" />
+    <select class="p_link" style="flex:1" title="Link to stock item (adds stock)">
+      <option value="">— not linked to stock —</option>
+      ${state.products.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}
+    </select>
+    <button class="iconbtn" onclick="this.parentElement.remove();calcPurchase()">✕</button>`;
+  box.appendChild(row);
+}
+
+function readPurchaseRows() {
+  return [...document.querySelectorAll('#p_items .pur-row')]
+    .map((r) => ({
+      name: r.querySelector('.p_name').value.trim(),
+      qty: Number(r.querySelector('.p_qty').value) || 1,
+      cost: Number(r.querySelector('.p_cost').value) || 0,
+      productId: r.querySelector('.p_link').value || null,
+    }))
+    .filter((i) => i.name);
+}
+
+function calcPurchase() {
+  const rows = readPurchaseRows();
+  const total = rows.reduce((s, r) => s + r.qty * r.cost, 0);
+  const mode = document.getElementById('p_mode').value;
+  const paidEl = document.getElementById('p_paid');
+  if (mode !== 'credit') paidEl.value = total.toFixed(2);
+  const paid = Number(paidEl.value) || 0;
+  document.getElementById('p_summary').innerHTML = `
+    <div class="spread"><span class="muted">Goods value</span><b>${money(total)}</b></div>
+    <div class="spread"><span class="muted">Paid now</span><b>${money(paid)}</b></div>
+    <div class="spread"><span><b>Balance payable (debit)</b></span><b style="font-size:1.15rem;color:var(--danger)">${money(Math.max(0, total - paid))}</b></div>`;
+}
+
+async function savePurchase() {
+  const rows = readPurchaseRows();
+  if (!rows.length) return toast('Add at least one item', 'err');
+  const body = {
+    supplier: document.getElementById('p_supplier').value,
+    supplierPhone: document.getElementById('p_phone').value,
+    billNo: document.getElementById('p_bill').value,
+    items: rows,
+    paymentMode: document.getElementById('p_mode').value,
+    paidAmount: Number(document.getElementById('p_paid').value) || 0,
+    note: document.getElementById('p_note').value,
+  };
+  try {
+    const { purchase } = await API.post('/api/admin/purchases', body);
+    toast('Purchase ' + purchase.billNo + ' saved', 'ok');
+    closeModal();
+    await loadProducts(true);
+    loadPurchases(); loadStats(); loadLedger(); loadProducts();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+function openPaySupplier(id) {
+  const rec = (state.purchases || []).find((x) => x.id === id);
+  if (!rec) return toast('Purchase not found', 'err');
+  const due = rec.due;
+  const supplier = rec.supplier;
+  openModal('Pay supplier — ' + supplier, `
+    <p class="muted">Outstanding payable: <b>${money(due)}</b></p>
+    <label class="field">Amount paying ₹ <span class="req">*</span><input id="pay_amt" type="number" min="1" max="${due}" value="${due}" /></label>
+    <label class="field">Mode
+      <select id="pay_mode"><option value="cash">Cash</option><option value="upi">UPI / Bank</option></select>
+    </label>
+    <button class="btn block" id="payBtn">Record payment (credit in ledger)</button>`);
+  document.getElementById('payBtn').onclick = async () => {
+    try {
+      await API.post(`/api/admin/purchases/${id}/pay`, {
+        amount: Number(document.getElementById('pay_amt').value),
+        mode: document.getElementById('pay_mode').value,
+      });
+      toast('Payment recorded', 'ok');
+      closeModal();
+      loadPurchases(); loadStats(); loadLedger();
+    } catch (e) { toast(e.message, 'err'); }
+  };
+}
+
+/* ================= USERS ================= */
+async function loadUsers(silent) {
+  try {
+    const { users } = await API.get('/api/admin/users');
+    state.users = users;
+    if (silent) return;
+    const box = document.getElementById('usersBody');
+    box.className = '';
+    box.innerHTML = `
+      <div class="badge info" style="margin-bottom:.8rem">${users.length} registered accounts (${users.filter((u) => u.role === 'customer').length} customers)</div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Customer</th><th>Contact</th><th>Address</th><th class="num">Orders</th><th class="num">Purchases</th><th class="num">Credit</th><th class="num">Debit</th><th class="num">Balance</th><th></th></tr></thead>
+        <tbody>${users.map((u) => `<tr>
+          <td><b>${esc(u.name)}</b><br /><small class="muted">${u.role === 'admin' ? 'ADMIN' : 'Customer'} • joined ${fmtDate(u.createdAt)}</small></td>
+          <td><small>${esc(u.email)}<br />${esc(u.phone || '-')}</small></td>
+          <td><small>${esc(u.address || '-')}</small></td>
+          <td class="num">${u.orderCount}</td>
+          <td class="num">${money(u.purchaseValue)}</td>
+          <td class="num">${money(u.ledger.credit)}</td>
+          <td class="num">${money(u.ledger.debit)}</td>
+          <td class="num"><span class="badge ${u.ledger.balance > 0 ? 'warn' : 'ok'}">${money(u.ledger.balance)}</span></td>
+          <td><button class="btn ghost sm" onclick="openUser(${u.id})">View</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function openUser(id) {
+  try {
+    const { user, orders, sales, ledger, balance } = await API.get(`/api/admin/users/${id}`);
+    openModal('Customer record — ' + user.name, `
+      <div class="grid g2">
+        <div class="card tight">
+          <h4 style="margin:0 0 .4rem">Profile</h4>
+          <table><tbody>
+            <tr><td class="muted">Name</td><td><b>${esc(user.name)}</b></td></tr>
+            <tr><td class="muted">Email</td><td>${esc(user.email)}</td></tr>
+            <tr><td class="muted">Phone</td><td>${esc(user.phone || '-')}</td></tr>
+            <tr><td class="muted">Address</td><td>${esc(user.address || '-')}</td></tr>
+            <tr><td class="muted">Joined</td><td>${fmtDate(user.createdAt)}</td></tr>
+          </tbody></table>
+        </div>
+        <div class="card tight">
+          <h4 style="margin:0 0 .4rem">Khata summary</h4>
+          <div class="spread"><span class="muted">Credit sales</span><b>${money(balance.credit)}</b></div>
+          <div class="spread"><span class="muted">Payments received</span><b>${money(balance.debit)}</b></div>
+          <div class="spread" style="margin-top:.5rem;border-top:1px dashed var(--line);padding-top:.5rem">
+            <span><b>Balance</b></span><b style="color:${balance.balance > 0 ? 'var(--warn)' : 'var(--ok)'};font-size:1.1rem">${money(balance.balance)}</b>
+          </div>
+          <p class="muted" style="font-size:.76rem;margin:.5rem 0 0">${balance.balance > 0 ? 'Customer has to pay this amount.' : 'No dues — customer is clear.'}</p>
+        </div>
+      </div>
+
+      <h4 style="margin:1rem 0 .4rem">Online orders (${orders.length})</h4>
+      <div class="table-scroll"><table><thead><tr><th>Order</th><th>Date</th><th class="num">Total</th><th>Status</th></tr></thead>
+        <tbody>${orders.length ? orders.map((o) => `<tr><td>${esc(o.orderNo)}</td><td>${fmtDate(o.date)}</td><td class="num">${money(o.total)}</td><td>${statusBadge(o.status)}</td></tr>`).join('') : '<tr><td colspan="4" class="muted">No online orders</td></tr>'}</tbody></table></div>
+
+      <h4 style="margin:1rem 0 .4rem">Counter sales (${sales.length})</h4>
+      <div class="table-scroll"><table><thead><tr><th>Invoice</th><th>Date</th><th class="num">Total</th><th class="num">Due</th><th>Mode</th></tr></thead>
+        <tbody>${sales.length ? sales.map((s) => `<tr><td>${esc(s.invoiceNo)}</td><td>${fmtDate(s.date)}</td><td class="num">${money(s.total)}</td><td class="num">${money(s.due)}</td><td>${esc(s.paymentMode)}</td></tr>`).join('') : '<tr><td colspan="5" class="muted">No counter sales</td></tr>'}</tbody></table></div>
+
+      <h4 style="margin:1rem 0 .4rem">Credit / debit entries (${ledger.length})</h4>
+      <div class="table-scroll"><table><thead><tr><th>Date</th><th>Particulars</th><th>Type</th><th class="num">Amount</th></tr></thead>
+        <tbody>${ledger.length ? ledger.map((e) => `<tr><td>${fmtDate(e.date)}</td><td><small>${esc(e.note)}</small></td><td><span class="badge ${e.type === 'credit' ? 'warn' : 'ok'}">${e.type}</span></td><td class="num">${money(e.amount)}</td></tr>`).join('') : '<tr><td colspan="4" class="muted">No ledger entries</td></tr>'}</tbody></table></div>`);
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+/* ================= LEDGER ================= */
+async function loadLedger() {
+  const box = document.getElementById('ledgerBody');
+  try {
+    const { entries, customers, suppliers, totals } = await API.get('/api/admin/ledger');
+    state.ledger = { entries, customers, suppliers };
+    box.className = '';
+    box.innerHTML = `
+      <div class="grid g4" style="margin-bottom:1rem">
+        <div class="stat amber"><div class="lbl">Credit sales</div><div class="val">${money0(totals.creditSale)}</div><div class="sub">udhaar given to customers</div></div>
+        <div class="stat"><div class="lbl">Payments received</div><div class="val">${money0(totals.received)}</div><div class="sub">debit against customers</div></div>
+        <div class="stat red"><div class="lbl">Credit purchases</div><div class="val">${money0(totals.debitPurchase)}</div><div class="sub">goods bought on credit</div></div>
+        <div class="stat"><div class="lbl">Paid to suppliers</div><div class="val">${money0(totals.supplierPaid)}</div><div class="sub">credit against suppliers</div></div>
+      </div>
+
+      <div class="grid g2" style="align-items:start;margin-bottom:1.2rem">
+        <div class="card">
+          <h3>Customer balances (who owes us)</h3>
+          <table><thead><tr><th>Customer</th><th class="num">Credit</th><th class="num">Debit</th><th class="num">Balance</th></tr></thead>
+            <tbody>${customers.length ? customers.map((c) => `<tr>
+              <td>${esc(c.name)}</td><td class="num">${money(c.credit)}</td><td class="num">${money(c.debit)}</td>
+              <td class="num"><span class="badge ${c.balance > 0 ? 'warn' : 'ok'}">${money(c.balance)}</span></td></tr>`).join('')
+              : '<tr><td colspan="4" class="muted">No customers yet</td></tr>'}</tbody></table>
+        </div>
+        <div class="card">
+          <h3>Supplier balances (what we owe)</h3>
+          <table><thead><tr><th>Supplier</th><th class="num">Debit</th><th class="num">Credit</th><th class="num">Payable</th></tr></thead>
+            <tbody>${suppliers.length ? suppliers.map((s) => `<tr>
+              <td>${esc(s.name)}</td><td class="num">${money(s.debit)}</td><td class="num">${money(s.credit)}</td>
+              <td class="num"><span class="badge ${s.balance > 0 ? 'bad' : 'ok'}">${money(s.balance)}</span></td></tr>`).join('')
+              : '<tr><td colspan="4" class="muted">No supplier entries yet</td></tr>'}</tbody></table>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:.6rem">All ledger entries (${entries.length})</h3>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Date</th><th>Party</th><th>Type</th><th>Particulars</th><th>Source</th><th class="num">Amount</th></tr></thead>
+        <tbody>${entries.length ? entries.map((e) => `<tr>
+          <td class="nowrap"><small>${fmtDateTime(e.date)}</small></td>
+          <td>${esc(e.partyName)}<br /><small class="muted">${e.partyType === 'supplier' ? 'Supplier' : 'Customer'}</small></td>
+          <td><span class="badge ${e.type === 'credit' ? (e.partyType === 'customer' ? 'warn' : 'ok') : (e.partyType === 'supplier' ? 'bad' : 'ok')}">
+            ${e.type === 'credit' ? 'Credit' : 'Debit'}</span></td>
+          <td><small>${esc(e.note)}</small></td>
+          <td><small class="muted">${esc(e.refType)}</small></td>
+          <td class="num"><b>${money(e.amount)}</b></td>
+        </tr>`).join('') : `<tr><td colspan="6"><div class="empty">No entries yet — credit sales and credit purchases appear here automatically.</div></td></tr>`}</tbody>
+      </table></div>`;
+  } catch (e) { box.className = 'empty'; box.textContent = e.message; }
+}
+
+function openLedgerModal() {
+  openModal('Add credit / debit entry', `
+    <p class="muted" style="font-size:.84rem">Use this to record a payment received from a customer, a payment made to a supplier, or an opening balance.</p>
+    <div class="form-grid">
+      <label class="field">Party type
+        <select id="l_party" onchange="togglePartyFields()">
+          <option value="customer">Customer</option>
+          <option value="supplier">Supplier</option>
+        </select>
+      </label>
+      <label class="field">Entry type
+        <select id="l_type">
+          <option value="debit">Debit — payment received / paid</option>
+          <option value="credit">Credit — sale or purchase on credit</option>
+        </select>
+      </label>
+      <label class="field" id="l_custWrap">Customer (registered)
+        <select id="l_cust"><option value="">— walk-in / type name below —</option>
+          ${state.users.filter((u) => u.role === 'customer').map((u) => `<option value="${u.id}">${esc(u.name)}</option>`).join('')}
+        </select>
+      </label>
+      <label class="field" id="l_custNameWrap">Or customer name<input id="l_custName" placeholder="Name for the khata" /></label>
+      <label class="field" id="l_nameWrap" style="display:none">Supplier name <span class="req">*</span><input id="l_supplier" placeholder="Supplier" /></label>
+      <label class="field">Amount ₹ <span class="req">*</span><input id="l_amount" type="number" min="1" step="0.01" /></label>
+      <label class="field">Mode<select id="l_mode"><option>cash</option><option>upi</option><option>bank</option><option>credit</option></select></label>
+      <label class="field full">Particulars<input id="l_note" placeholder="e.g. cash received against March dues" /></label>
+    </div>
+    <button class="btn block" id="saveLedger">Save entry</button>`);
+  document.getElementById('saveLedger').onclick = async () => {
+    const partyType = document.getElementById('l_party').value;
+    const body = {
+      partyType,
+      type: document.getElementById('l_type').value,
+      partyId: partyType === 'customer' ? document.getElementById('l_cust').value || null : null,
+      partyName:
+        partyType === 'supplier'
+          ? document.getElementById('l_supplier').value
+          : document.getElementById('l_cust').value
+            ? document.getElementById('l_cust').selectedOptions[0].textContent
+            : document.getElementById('l_custName').value,
+      amount: Number(document.getElementById('l_amount').value),
+      mode: document.getElementById('l_mode').value,
+      note: document.getElementById('l_note').value,
+    };
+    try {
+      await API.post('/api/admin/ledger', body);
+      toast('Ledger entry saved', 'ok');
+      closeModal();
+      loadLedger(); loadStats(); loadUsers(); loadSales();
+    } catch (e) { toast(e.message, 'err'); }
+  };
+}
+
+function togglePartyFields() {
+  const isSupplier = document.getElementById('l_party').value === 'supplier';
+  document.getElementById('l_custWrap').style.display = isSupplier ? 'none' : 'block';
+  document.getElementById('l_custNameWrap').style.display = isSupplier ? 'none' : 'block';
+  document.getElementById('l_nameWrap').style.display = isSupplier ? 'block' : 'none';
+}
+
+/* ---------------- start ---------------- */
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "vs-pharma-medical-store",
+  "version": "1.0.0",
+  "description": "VS Pharma & Medical Store — medicine & pharmacy seller website with customer login and admin panel (credit/debit ledger, sales, purchases, users).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "reset": "node -e \"const fs=require('fs');const p='./data';if(fs.existsSync(p))fs.rmSync(p,{recursive:true,force:true});console.log('data folder reset - restart the server')\""
+  },
+  "keywords": ["pharmacy", "medical", "medicine", "admin-panel", "inventory", "ledger", "nodejs"],
+  "author": "VS Pharma & Medical Store",
+  "license": "MIT",
+  "engines": { "node": ">=18" }
+}

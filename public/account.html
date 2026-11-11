@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Account — VS Pharma &amp; Medical Store</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23070707'/><path d='M42 22h16v20h20v16H58v20H42V58H22V42h20z' fill='%23d4af37'/></svg>" />
+<link rel="stylesheet" href="/css/style.css?v=2026-11-11-onyx4" />
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="/"><span class="mark">VS</span><span>VS Pharma &amp; Medical Store<small>Customer portal</small></span></a>
+    <nav class="main">
+      <a class="navlink" href="/#shop">Shop</a>
+      <span id="navAuth" class="row" style="gap:.5rem"></span>
+      <button class="btn cart-btn" id="cartBtn" onclick="location.href='/index.html'">🛒 Cart <span class="count" id="cartCount" style="display:none">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap section" id="app">
+  <div class="empty">Loading your account…</div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="bottom">
+      <span>© 2026 VS Pharma &amp; Medical Store. All rights reserved.</span>
+      <span>Drug Licence PB-AMR-2026-1188 • Prices in ₹ (INR)</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/common.js?v=2026-11-11-onyx4"></script>
+<script>
+const app = document.getElementById('app');
+
+function statusBadge(s) {
+  const map = { pending: 'warn', packed: 'info', delivered: 'ok', cancelled: 'bad' };
+  return `<span class="badge ${map[s] || 'muted'}">${esc(s)}</span>`;
+}
+
+async function boot() {
+  const user = await me();
+  if (!user) {
+    app.innerHTML = `<div class="card center" style="max-width:520px;margin:2rem auto">
+      <span style="font-size:2rem">🔐</span>
+      <h2>Please login</h2>
+      <p class="muted">Login to view your orders, purchases and credit (khata) balance.</p>
+      <a class="btn" href="/login.html?next=/account.html">Go to login</a>
+    </div>`;
+    return;
+  }
+  if (user.role === 'admin') { location.href = '/admin.html'; return; }
+
+  const { orders, ledger, balance } = await API.get('/api/orders/mine');
+  const totalSpent = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0);
+
+  app.innerHTML = `
+    <div class="spread" style="margin-bottom:1.2rem">
+      <div>
+        <span class="overline">Customer Portal</span>
+        <h1 style="margin-bottom:.1rem">Hello, ${esc(user.name.split(' ')[0])} 👋</h1>
+        <p class="muted" style="margin:0">Here are your purchases and credit records with VS Pharma.</p>
+      </div>
+      <a class="btn ghost" href="/index.html#shop">Continue shopping</a>
+    </div>
+
+    <div class="grid g4" style="margin-bottom:1.4rem">
+      <div class="stat"><div class="lbl">Total orders</div><div class="val">${orders.length}</div><div class="sub">online purchases</div></div>
+      <div class="stat blue"><div class="lbl">Total purchased</div><div class="val">${money0(totalSpent)}</div><div class="sub">value of all orders</div></div>
+      <div class="stat ${balance.balance > 0 ? 'red' : ''}"><div class="lbl">Khata balance</div><div class="val">${money(balance.balance)}</div><div class="sub">${balance.balance > 0 ? 'amount payable by you' : 'no dues'}</div></div>
+      <div class="stat"><div class="lbl">Credit / Debit</div><div class="val" style="font-size:1.05rem">${money0(balance.credit)} / ${money0(balance.debit)}</div><div class="sub">credit sales / payments made</div></div>
+    </div>
+
+    <div class="grid g2" style="align-items:start">
+      <div class="card">
+        <div class="spread"><h3 style="margin:0">My profile</h3><button class="btn ghost sm" id="editBtn">Edit</button></div>
+        <table style="margin-top:.6rem">
+          <tbody>
+            <tr><td class="muted">Name</td><td><b>${esc(user.name)}</b></td></tr>
+            <tr><td class="muted">Email</td><td>${esc(user.email)}</td></tr>
+            <tr><td class="muted">Phone</td><td>${esc(user.phone || '-')}</td></tr>
+            <tr><td class="muted">Address</td><td>${esc(user.address || '-')}</td></tr>
+            <tr><td class="muted">Member since</td><td>${fmtDate(user.createdAt)}</td></tr>
+          </tbody>
+        </table>
+        <div id="editBox" class="hidden" style="margin-top:1rem;border-top:1px dashed var(--line);padding-top:1rem">
+          <div class="form-grid">
+            <label class="field">Name<input id="pName" value="${esc(user.name)}" /></label>
+            <label class="field">Phone<input id="pPhone" value="${esc(user.phone || '')}" /></label>
+            <label class="field full">Address<input id="pAddress" value="${esc(user.address || '')}" /></label>
+            <label class="field full">New password (optional)<input id="pPass" type="password" placeholder="leave blank to keep same" /></label>
+          </div>
+          <button class="btn sm" id="saveProfile">Save changes</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>How your khata works</h3>
+        <table>
+          <tbody>
+            <tr><td><span class="badge warn">Credit</span></td><td>A medicine taken on udhaar / a credit sale → increases what you owe.</td></tr>
+            <tr><td><span class="badge ok">Debit</span></td><td>A payment you made to the store → reduces your balance.</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:.82rem;margin-top:.8rem">Every entry is entered by the store admin and cannot be edited by customers. Contact the store on +91 98765 43210 for any correction.</p>
+      </div>
+    </div>
+
+    <h2 style="margin:2rem 0 .8rem">My orders</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Order no.</th><th>Date</th><th>Items</th><th class="num">Total</th><th>Payment</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+          ${orders.length ? orders.map(o => `<tr>
+            <td><b>${esc(o.orderNo)}</b></td>
+            <td class="nowrap">${fmtDate(o.date)}</td>
+            <td>${o.items.map(i => `${esc(i.name)} × ${i.qty}`).join('<br />')}</td>
+            <td class="num">${money(o.total)}</td>
+            <td><span class="badge ${o.paymentMode === 'credit' ? 'warn' : 'muted'}">${o.paymentMode === 'credit' ? 'Khata credit' : o.paymentMode.toUpperCase()}</span></td>
+            <td>${statusBadge(o.status)}</td>
+          </tr>`).join('') : `<tr><td colspan="6"><div class="empty">No orders yet. <a href="/index.html#shop">Start shopping →</a></div></td></tr>`}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 style="margin:2rem 0 .8rem">My credit / debit statement</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Particulars</th><th>Type</th><th class="num">Amount</th><th class="num">Running due</th>
+        </tr></thead>
+        <tbody>
+          ${ledger.length ? (() => {
+            const chrono = ledger.slice().reverse();
+            let run = 0;
+            return chrono.map(e => {
+              run += e.type === 'credit' ? e.amount : -e.amount;
+              return `<tr>
+                <td class="nowrap">${fmtDate(e.date)}</td>
+                <td>${esc(e.note || '-')}</td>
+                <td><span class="badge ${e.type === 'credit' ? 'warn' : 'ok'}">${e.type === 'credit' ? 'Credit (sale)' : 'Debit (payment)'}</span></td>
+                <td class="num">${money(e.amount)}</td>
+                <td class="num"><b>${money(run)}</b></td>
+              </tr>`;
+            }).join('');
+          })() : `<tr><td colspan="5"><div class="empty">No credit or debit entries — your account is clear.</div></td></tr>`}
+        </tbody>
+        <tfoot>
+          <tr><th colspan="3">Closing balance</th><th class="num">${money(balance.balance)}</th><th class="num">${balance.balance > 0 ? 'Payable' : balance.balance < 0 ? 'Advance' : 'Clear'}</th></tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('editBtn').onclick = () => document.getElementById('editBox').classList.toggle('hidden');
+  document.getElementById('saveProfile').onclick = async () => {
+    try {
+      const body = {
+        name: document.getElementById('pName').value,
+        phone: document.getElementById('pPhone').value,
+        address: document.getElementById('pAddress').value,
+      };
+      const pass = document.getElementById('pPass').value;
+      if (pass) body.password = pass;
+      await API.put('/api/auth/profile', body);
+      clearMe();
+      toast('Profile updated', 'ok');
+      boot();
+      paintHeader();
+    } catch (e) { toast(e.message, 'err'); }
+  };
+}
+
+boot();
+paintHeader();
+</script>
+</body>
+</html>
