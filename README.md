@@ -68,13 +68,14 @@ vs-pharmacy/
 ├── src/
 │   ├── app.js              # shared request handler (API router + static files) used by both entries
 │   ├── db.js               # JSON storage layer (one file per collection, atomic writes, /tmp fallback)
-│   ├── auth.js             # scrypt password hashing + cookie sessions
-│   ├── api.js              # every API endpoint (auth, products, orders, sales, purchases, ledger, users, stats)
+│   ├── auth.js             # scrypt password hashing + stateless signed session tokens
+│   ├── api.js              # every API endpoint + /api/health diagnostics
 │   └── seed.js             # first-run seed: admin + customer + 24 medicines
 ├── public/
 │   ├── index.html          # storefront: hero, search, medicine grid, cart drawer, checkout
 │   ├── login.html          # user login + register (admin can log in here too)
 │   ├── account.html        # customer portal: profile, orders, credit/debit statement
+│   ├── status.html         # one-click deployment/auth diagnostics
 │   ├── admin.html          # admin panel (7 sections)
 │   ├── css/style.css       # full stylesheet (no CDN, works offline)
 │   └── js/common.js        # API helper, ₹ money formatter, cart, toasts, header state
@@ -185,6 +186,42 @@ git push                      # Vercel auto-redeploys if the repo is connected
 ```
 or, from the CLI: `npm i -g vercel && vercel --prod`
 
+### Sessions are stateless (this is what fixed “Please login first”)
+
+Login returns a **signed token** (HMAC-SHA256) instead of a row in a session table:
+
+```
+eyJ1aWQiOjIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc2… . <signature>
+```
+
+* The token is sent back as a cookie **and** as `Authorization: Bearer <token>`.
+* Nothing is stored server-side, so any instance / any cold start can verify it —
+  no shared session store needed.
+* It carries `uid`, `role`, `iat`, `exp` (7 days) and is rejected if the signature
+  or the expiry is wrong.
+
+Set a secret to make tokens unique to your deployment (recommended on Vercel →
+*Settings → Environment Variables*):
+
+```bash
+AUTH_SECRET=<any long random string>
+```
+
+Without it a development default is used, so everything still works.
+
+### Diagnose a deployment in one click
+
+Open **`/status.html`** on any deployment. It checks and reports:
+
+* whether the page is framed, and whether storage is blocked (sandboxed iframes)
+* `GET /api/health` → runtime, auth mode, data dir, whether it is temporary
+* whether you are currently logged in
+* a **full auth test**: logs in as the demo customer, verifies the token on a
+  fresh request, then probes `POST /api/orders` (an empty cart must answer
+  `400 Cart is empty` — a `401` means auth is broken), then logs out
+
+Copy the report back if something still misbehaves.
+
 ### Storage on Vercel (important)
 
 Serverless disks are **read-only and ephemeral**, so `data/*.json` cannot persist there. `src/db.js` detects this automatically and swaps to `/tmp/vs-pharma-data`:
@@ -221,6 +258,10 @@ Functional tints (used only for status, never as decoration): success `#5CB98A`,
 * **Ivory invitation cards** (`class="card paper-card"`) carry the login / register / admin-login forms — the third colour used as a real surface for maximum contrast.
 * Admin sidebar: black glass with a gold active rail; tables on near-black with gold letter-spaced headers.
 * Custom dark scrollbars, gold text selection, no external fonts or images (works fully offline).
+* **Kept cheap on purpose:** no `backdrop-filter` blurs, no `background-attachment: fixed`
+  and no `mask-image` layers — those force full-viewport repaints and tank the
+  frame rate on low-end laptops and inside preview iframes. Hover effects animate
+  only `transform` / `border-color`, never `box-shadow`.
 
 Re-skin in three lines:
 

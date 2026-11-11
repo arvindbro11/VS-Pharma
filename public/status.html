@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>System check — VS Pharma</title>
+<style>
+  :root{--black:#070707;--panel:#111;--gold:#d4af37;--gold-soft:#f2dc9b;--ivory:#f5efe3;--muted:#8f897c;--line:#262626;--ok:#5cb98a;--bad:#d97068;--sans:"Segoe UI",system-ui,Arial,sans-serif;--serif:Georgia,serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--black);color:var(--ivory);font-family:var(--sans);line-height:1.6;padding:2rem 1rem}
+  .wrap{max-width:780px;margin:0 auto}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:0 0 .2rem;color:var(--ivory)}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1rem}
+  .row{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding:.42rem 0;border-bottom:1px solid #1b1b1b;font-size:.86rem}
+  .row:last-child{border-bottom:0}
+  .row b{color:var(--ivory);font-weight:600}
+  .ok{color:var(--ok);font-weight:700}
+  .bad{color:var(--bad);font-weight:700}
+  .warn{color:var(--gold)}
+  code,pre{font-family:ui-monospace,Consolas,monospace;font-size:.76rem}
+  pre{background:#0b0b0b;border:1px solid var(--line);border-radius:10px;padding:.9rem;overflow:auto;color:#cfc7b8;white-space:pre-wrap;max-height:340px}
+  button{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#14100a;border:1px solid #8f6f1f;border-radius:9px;padding:.6rem 1.1rem;font:inherit;font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+  button.ghost{background:transparent;color:var(--ivory);border-color:var(--line)}
+  .actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
+  a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>System check</h1>
+  <div class="sub">Runs live checks against this deployment and prints a report you can copy back to me.</div>
+
+  <div class="panel" id="results"><div class="row"><b>Running checks…</b><span class="warn">●</span></div></div>
+
+  <div class="panel">
+    <div class="row" style="border:0"><b>Report</b><span class="sub" style="margin:0">copy everything in the box</span></div>
+    <pre id="report">…</pre>
+    <div class="actions">
+      <button id="copy">Copy report</button>
+      <button class="ghost" id="again">Run again</button>
+      <button class="ghost" onclick="location.href='/'">← Back to store</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const out = [];
+const rowEl = document.getElementById('results');
+
+function line(label, value, cls) {
+  const d = document.createElement('div');
+  d.className = 'row';
+  d.innerHTML = `<b>${label}</b><span class="${cls || ''}">${value}</span>`;
+  rowEl.appendChild(d);
+  out.push(`${label}: ${value}`);
+}
+
+function storageOK(kind) {
+  try {
+    const s = window[kind];
+    s.setItem('__t', '1'); s.removeItem('__t');
+    return true;
+  } catch (e) { return false; }
+}
+
+async function api(path, opts = {}) {
+  const token = (() => { try { return localStorage.getItem('vs_pharma_token') || sessionStorage.getItem('vs_pharma_token'); } catch (e) { return null; } })();
+  const headers = Object.assign({}, opts.headers || {});
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (opts.body) headers['Content-Type'] = 'application/json';
+  const res = await fetch(path, Object.assign({}, opts, { headers, credentials: 'include' }));
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  return { status: res.status, data };
+}
+
+async function run() {
+  rowEl.innerHTML = '';
+  out.length = 0;
+
+  // 1. page + origin
+  line('Page URL', location.origin + location.pathname);
+  line('Framed?', window.top !== window.self ? 'yes (inside an iframe)' : 'no');
+  line('Secure context', window.isSecureContext ? 'yes (https)' : 'no (http)');
+
+  // 2. storage
+  const ls = storageOK('localStorage'), ss = storageOK('sessionStorage');
+  line('localStorage', ls ? 'available' : 'BLOCKED (sandbox)', ls ? 'ok' : 'bad');
+  line('sessionStorage', ss ? 'available' : 'BLOCKED (sandbox)', ss ? 'ok' : 'bad');
+
+  // 3. api health
+  try {
+    const h = await api('/api/health');
+    line('GET /api/health', h.status, h.status === 200 ? 'ok' : 'bad');
+    if (h.data) {
+      line('runtime', h.data.runtime || '?');
+      line('auth mode', h.data.authMode || '?');
+      line('AUTH_SECRET set', h.data.authSecretConfigured ? 'yes' : 'no (using default)');
+      line('data dir', h.data.dataDir + (h.data.ephemeralStorage ? ' (TEMPORARY)' : ''));
+      line('seeded users / products', `${h.data.users} / ${h.data.products}`);
+    }
+  } catch (e) { line('GET /api/health', 'FAILED: ' + e.message, 'bad'); }
+
+  // 4. current session
+  const me1 = await api('/api/auth/me').catch((e) => ({ status: 0, data: { error: e.message } }));
+  line('GET /api/auth/me (current)', me1.status + (me1.data && me1.data.user ? ' — ' + me1.data.user.name : ' — nobody logged in'), me1.status === 200 ? 'ok' : 'warn');
+
+  // 5. full auth chain test with the demo customer
+  const login = await api('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: 'rahul@example.com', password: 'user123' }),
+  }).catch((e) => ({ status: 0, data: { error: e.message } }));
+
+  const token = login.data && login.data.token;
+  line('POST /api/auth/login', login.status + (login.data && login.data.user ? ' — ' + login.data.user.name : ' — ' + ((login.data && login.data.error) || '')),
+       login.status === 200 ? 'ok' : 'bad');
+  line('login returned a token', token ? 'yes (' + String(token).slice(0, 12) + '…)' : 'NO', token ? 'ok' : 'bad');
+
+  if (token) {
+    // send the token the SAME way the site does (header, no cookie)
+    const me2 = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } }).then((r) => r.json()).catch(() => ({}));
+    line('token works on a new request', me2.user ? 'yes — ' + me2.user.name : 'NO', me2.user ? 'ok' : 'bad');
+
+    // authenticated probe: an empty cart must answer 400 (not 401)
+    const probe = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ items: [], paymentMode: 'cod', phone: '9812345678', address: 'test address' }),
+    }).then(async (r) => ({ status: r.status, data: await r.json().catch(() => ({})) })).catch(() => ({ status: 0, data: {} }));
+    const authOK = probe.status === 400;
+    line('POST /api/orders (auth probe)', probe.status + ' — ' + (probe.data.error || 'ok') + (authOK ? '  → auth WORKS' : '  → AUTH PROBLEM'),
+         authOK ? 'ok' : 'bad');
+
+    await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + token } }).catch(() => {});
+  }
+
+  document.getElementById('report').textContent =
+    'VS Pharma — system check\n' + new Date().toISOString() + '\n' + navigator.userAgent + '\n\n' + out.join('\n');
+}
+
+document.getElementById('again').onclick = run;
+document.getElementById('copy').onclick = async () => {
+  const text = document.getElementById('report').textContent;
+  try { await navigator.clipboard.writeText(text); document.getElementById('copy').textContent = 'Copied ✓'; }
+  catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); document.getElementById('copy').textContent = 'Copied ✓'; } catch (e2) {}
+    ta.remove();
+  }
+};
+
+run();
+</script>
+</body>
+</html>

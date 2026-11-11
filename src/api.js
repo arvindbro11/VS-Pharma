@@ -103,6 +103,27 @@ function matchRoute(method, pathname) {
   return null;
 }
 
+/* ---------------- HEALTH / DIAGNOSTICS (public) ---------------- */
+route('GET', '/api/health', () => ({
+  status: 200,
+  body: {
+    ok: true,
+    runtime: process.env.VERCEL ? 'vercel-serverless' : 'node-server',
+    node: process.version,
+    authMode: 'stateless-hmac-token',
+    authSecretConfigured: Boolean(process.env.AUTH_SECRET),
+    dataDir: db.dataDir(),
+    ephemeralStorage: db.isEphemeral,
+    users: db.read('users').length,
+    products: db.read('products').length,
+    orders: db.read('orders').length,
+    sales: db.read('sales').length,
+    purchases: db.read('purchases').length,
+    ledger: db.read('ledger').length,
+    time: new Date().toISOString(),
+  },
+}));
+
 /* ---------------- AUTH ---------------- */
 route('POST', '/api/auth/register', (ctx) => {
   const name = str(ctx.body.name, 'Name', { min: 2 });
